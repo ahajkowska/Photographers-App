@@ -1,0 +1,26 @@
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 100px;
+    padding: 0;
+    background-color: rgb(241, 212, 158);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#search{
+    padding: 10px;
+    border: 2px solid orange;
+    border-radius: 10px;
+    width: 300px;
+    cursor: pointer;
+}
+
+#list{
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
