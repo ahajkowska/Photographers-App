@@ -10,6 +10,7 @@ body {
     width: 100%;
     margin: 0;
     padding: 0;
+    padding-bottom: 50px;
 }
   
 .search-section {
@@ -49,14 +50,13 @@ body {
     list-style: none;
     padding: 0;
     margin: 0;
+    margin-left: 22%;
     margin-top: 10px;
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
-    width: 50%;
-    max-height: 75vh;
+    width: 60%;
     overflow-y: auto;
-    min-height: 73vh;
 }
   
 .pokemon-list div {
@@ -102,12 +102,13 @@ body {
     padding-top: 5px;
     border-radius: 5px;
     border: 1px solid #ccc;
-    width: 250px;
+    width: 400px;
     height: 70vh;
     min-height: 320px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     margin-right: 190px;
 }
   
@@ -160,6 +161,7 @@ body {
 
 .pokemon-details-layout {
     padding: 20px;
+    align-items: center;
 }
 
 .breadcrumbs {
@@ -203,5 +205,37 @@ body {
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
+.limit-section {
+    margin: 20px;
+}
+
+.limit-section label {
+    margin-right: 10px;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.limit-section select {
+    padding: 5px;
+    font-size: 1em;
+}
+
+.type-section {
+    margin: 20px;
+}
+
+.type-section label {
+    margin-right: 10px;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.type-section select {
+    padding: 5px;
+    font-size: 1em;
+}

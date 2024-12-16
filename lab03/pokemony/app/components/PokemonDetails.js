@@ -26,7 +26,7 @@ export default function PokemonDetails({ selectedPokemon, onBack, onFavorite }) 
         }
     }, [selectedPokemon]);
 
-    // If no Pokémon is selected, render nothing
+    // jesli nie ma wybranego pokemona => nic nie wyswietlaj
     if (!selectedPokemon) {
         return null;
     }

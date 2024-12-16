@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 
 export default function PokemonDetailsPage({ params }) {
-    const { id } = params; // Extract the Pokémon ID from the URL
+    const { id } = params; // weź pokemon id z url
     const [pokemonDetails, setPokemonDetails] = useState(null);
     const [loading, setLoading] = useState(true);
 
