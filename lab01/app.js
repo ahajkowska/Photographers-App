@@ -70,3 +70,17 @@ function displayPokemonDetails(pokemon) {
 }
 
 fetchPokemonList();
+
+const searchInput = document.getElementById("search");
+searchInput.addEventListener("input", (event) => {
+    const query = event.target.value.toLowerCase();
+    const listItems = Array.from(pokemonList.children);
+    listItems.forEach((item) => {
+        const pokemonName = item.textContent.toLowerCase();
+        if (pokemonName.includes(query)) {
+            item.style.display = "block";
+        } else {
+            item.style.display = "none";
+        }
+    });
+});
