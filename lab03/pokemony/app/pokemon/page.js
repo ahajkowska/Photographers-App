@@ -16,6 +16,8 @@ export default function MainPage() {
     // local state dla search input
     const [searchInput, setSearchInput] = useState(searchQuery);
 
+    const [favorites, setFavorites] = useState([]); // Favorite Pokémon list
+
     // Fetchowanie pokemonow
     useEffect(() => {
         const fetchPokemons = async () => {
@@ -50,6 +52,10 @@ export default function MainPage() {
             } catch (error) {
                 console.error('Error fetching Pokémon:', error);
             }
+
+            // Load favorites from localStorage
+            const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
+            setFavorites(storedFavorites);
         };
 
         fetchPokemons();
@@ -71,6 +77,16 @@ export default function MainPage() {
     const filteredPokemons = pokemons.filter((pokemon) =>
         pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    // Add Pokémon to favorites
+    const addToFavorites = (pokemon) => {
+        const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        if (!storedFavorites.some((fav) => fav.id === pokemon.id)) {
+            const updatedFavorites = [...storedFavorites, pokemon];
+            localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+            setFavorites(updatedFavorites);
+        }
+    };
 
     return (
         <div className="container">
@@ -143,6 +159,9 @@ export default function MainPage() {
                     >
                         <img src={pokemon.image} alt={pokemon.name} />
                         <span>{pokemon.name}</span>
+                        <button onClick={() => addToFavorites(pokemon)}>
+                                Add to Favorites
+                        </button>
                     </div>
                 ))}
             </div>
