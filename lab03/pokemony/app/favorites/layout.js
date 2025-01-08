@@ -1,8 +1,11 @@
 export default function FavoritesLayout({ children }) {
     return (
-        <div>
-            <h1>Favorites</h1>
-            {children}
-        </div>
+      <div className="favorites-layout">
+        <header>
+          <h1>Ulubione Pokémony</h1>
+        </header>
+        <main>{children}</main>
+      </div>
     );
-}
+  }
+  

@@ -1,60 +1,44 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import PokemonDetails from '../../components/PokemonDetails';
 
-export default function PokemonDetailsPage({ params }) {
-    const { id } = params; // weź pokemon id z url
-    const [pokemonDetails, setPokemonDetails] = useState(null);
-    const [loading, setLoading] = useState(true);
+export default function PokemonDetailsPage() {
+  const { id } = useParams();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [pokemonDetails, setPokemonDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        setLoading(true);
-        fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
-            .then((response) => response.json())
-            .then((data) => {
-                setPokemonDetails(data);
-                setLoading(false);
-            })
-            .catch(() => setLoading(false));
-    }, [id]);
+  useEffect(() => {
+    async function fetchPokemonDetails() {
+      try {
+        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+        const data = await response.json();
+        setPokemonDetails(data);
+      } catch (error) {
+        console.error('Błąd podczas pobierania szczegółów:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPokemonDetails();
+  }, [id]);
 
-    return (
-        <div className="pokemon-details">
-            {loading ? (
-                <p>Loading...</p>
-            ) : pokemonDetails ? (
-                <>
-                    <h1>
-                        #{pokemonDetails.id} {pokemonDetails.name}
-                    </h1>
-                    <img
-                        src={pokemonDetails.sprites.front_default}
-                        alt={pokemonDetails.name}
-                    />
-                    <p>
-                        <strong>Types:</strong>{' '}
-                        {pokemonDetails.types.map((type) => type.type.name).join(', ')}
-                    </p>
-                    <p>
-                        <strong>Height:</strong> {pokemonDetails.height / 10} m
-                    </p>
-                    <p>
-                        <strong>Weight:</strong> {pokemonDetails.weight / 10} kg
-                    </p>
-                    <p>
-                        <strong>Stats:</strong>
-                    </p>
-                    <ul>
-                        {pokemonDetails.stats.map((stat) => (
-                            <li key={stat.stat.name}>
-                                {stat.stat.name}: {stat.base_stat}
-                            </li>
-                        ))}
-                    </ul>
-                </>
-            ) : (
-                <p>Unable to load Pokémon details.</p>
-            )}
-        </div>
-    );
+  const view = searchParams.get('view');
+
+  return (
+    <div className="pokemon-details-page">
+      {loading ? (
+        <p>Ładowanie szczegółów...</p>
+      ) : (
+        <PokemonDetails
+          pokemonDetails={pokemonDetails}
+          loadingDetails={loading}
+          onBack={() => router.push('/pokemon')}
+        />
+      )}
+    </div>
+  );
 }
