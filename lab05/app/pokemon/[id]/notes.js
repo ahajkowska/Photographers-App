@@ -71,7 +71,7 @@ function NotesList({ pokemonId, onEditNote, onDelete }) {
             <p>Skuteczność: {note.effectiveness}</p>
             <p>Warunki: {note.conditions}</p>
             <p>Data treningu: {note.trainingDate}</p>
-            <p>Przeciwnicy: {note.opponents.join(", ")}</p>
+            <p>Przeciwnicy: {Array.isArray(note.opponents) ? note.opponents.join(", ") : "Brak"}</p>
           </div>
           <div className="note-actions">
             <button className="edit-button" onClick={() => onEditNote(note)}>Edytuj</button>

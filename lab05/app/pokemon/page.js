@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import PokemonList from '../components/PokemonList';
 import ComparisonView from '../components/ComparisonView';
 
+const pokeAPI = "https://pokeapi.co/api/v2/pokemon"
+
 export default function PokemonPage() {
   const [pokemonList, setPokemonList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
@@ -37,7 +39,7 @@ export default function PokemonPage() {
   useEffect(() => {
     const fetchPokemonList = async () => {
       try {
-        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=50');
+        const response = await fetch(`${pokeAPI}?limit=50`);
         const { results } = await response.json();
         const detailedPokemonList = await Promise.all(
           results.map((pokemon) => fetch(pokemon.url).then((res) => res.json()))
