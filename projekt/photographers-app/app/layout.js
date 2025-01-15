@@ -2,6 +2,7 @@
 import "../styles/globals.css";
 import "../styles/components.css";
 import "../styles/gallery.css";
+import "../styles/projects.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
