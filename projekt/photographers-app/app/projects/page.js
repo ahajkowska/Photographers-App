@@ -3,13 +3,16 @@
 import { useState, useEffect } from "react";
 import { Formik, Form, Field, FieldArray } from "formik";
 import * as Yup from "yup";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css"; // Import the CSS for react-datepicker
+import Timeline from "../../components/Timeline"; // Import the Timeline component
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
-  const [isEditing, setIsEditing] = useState(false); // Tracks if a project is being edited
-  const [currentProject, setCurrentProject] = useState(null); // Stores the project being edited
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentProject, setCurrentProject] = useState(null);
 
-    // Fetch Projects from Backend
+  // Fetch Projects from Backend
   useEffect(() => {
     fetch("/api/projects")
       .then((res) => res.json())
@@ -25,7 +28,12 @@ export default function ProjectsPage() {
       .of(Yup.string().required("Equipment is required"))
       .min(1, "You must add at least one piece of equipment"),
     deadlines: Yup.array()
-      .of(Yup.string().required("Deadline is required"))
+      .of(
+        Yup.object().shape({
+          date: Yup.date().required("Date is required"),
+          description: Yup.string().required("Description is required"),
+        })
+      )
       .min(1, "You must add at least one deadline"),
   });
 
@@ -56,13 +64,11 @@ export default function ProjectsPage() {
     }
   };
 
-  // Edit Project
   const handleEditProject = (project) => {
     setIsEditing(true);
     setCurrentProject(project);
   };
 
-  // Delete Project
   const handleDeleteProject = async (id) => {
     await fetch("/api/projects", {
       method: "DELETE",
@@ -83,7 +89,7 @@ export default function ProjectsPage() {
             title: "",
             equipment: [""],
             idea: "",
-            deadlines: [""],
+            deadlines: [{ date: null, description: "" }],
           }
         }
         enableReinitialize
@@ -93,7 +99,7 @@ export default function ProjectsPage() {
           resetForm();
         }}
       >
-        {({ values, errors, touched }) => (
+        {({ values, setFieldValue, errors, touched }) => (
           <Form className="project-form">
             {/* Project Title */}
             <div>
@@ -122,37 +128,14 @@ export default function ProjectsPage() {
                         <Field
                           name={`equipment[${index}]`}
                           placeholder="Enter equipment"
-                          className={`form-field ${
-                            errors.equipment &&
-                            errors.equipment[index] &&
-                            touched.equipment &&
-                            touched.equipment[index]
-                              ? "error-field"
-                              : ""
-                          }`}
+                          className="form-field"
                         />
-                        <button
-                          type="button"
-                          onClick={() => remove(index)}
-                          style={{ padding: "5px 10px" }}
-                        >
+                        <button type="button" onClick={() => remove(index)}>
                           Remove
                         </button>
-                        {errors.equipment &&
-                          errors.equipment[index] &&
-                          touched.equipment &&
-                          touched.equipment[index] && (
-                            <div className="error-message">
-                              {errors.equipment[index]}
-                            </div>
-                          )}
                       </div>
                     ))}
-                    <button
-                      type="button"
-                      onClick={() => push("")}
-                      style={{ marginTop: "10px" }}
-                    >
+                    <button type="button" onClick={() => push("")}>
                       Add Equipment
                     </button>
                   </div>
@@ -173,47 +156,35 @@ export default function ProjectsPage() {
               />
             </div>
 
-            {/* Dates and Deadlines */}
+            {/* Dates and Deadlines Section */}
             <div>
               <label>Dates & Deadlines</label>
               <FieldArray name="deadlines">
                 {({ push, remove }) => (
                   <div>
-                    {values.deadlines.map((date, index) => (
+                    {values.deadlines.map((deadline, index) => (
                       <div key={index} style={{ display: "flex", gap: "10px" }}>
-                        <Field
-                          name={`deadlines[${index}]`}
-                          placeholder="Enter deadline"
-                          className={`form-field ${
-                            errors.deadlines &&
-                            errors.deadlines[index] &&
-                            touched.deadlines &&
-                            touched.deadlines[index]
-                              ? "error-field"
-                              : ""
-                          }`}
+                        <DatePicker
+                          selected={deadline.date}
+                          onChange={(date) =>
+                            setFieldValue(`deadlines[${index}].date`, date)
+                          }
+                          placeholderText="Pick a date"
+                          className="form-field"
                         />
-                        <button
-                          type="button"
-                          onClick={() => remove(index)}
-                          style={{ padding: "5px 10px" }}
-                        >
+                        <Field
+                          name={`deadlines[${index}].description`}
+                          placeholder="What's this deadline about?"
+                          className="form-field"
+                        />
+                        <button type="button" onClick={() => remove(index)}>
                           Remove
                         </button>
-                        {errors.deadlines &&
-                          errors.deadlines[index] &&
-                          touched.deadlines &&
-                          touched.deadlines[index] && (
-                            <div className="error-message">
-                              {errors.deadlines[index]}
-                            </div>
-                          )}
                       </div>
                     ))}
                     <button
                       type="button"
-                      onClick={() => push("")}
-                      style={{ marginTop: "10px" }}
+                      onClick={() => push({ date: null, description: "" })}
                     >
                       Add Deadline
                     </button>
@@ -237,10 +208,16 @@ export default function ProjectsPage() {
             <h3>{project.title}</h3>
             <p><strong>Equipment:</strong> {project.equipment.join(", ") || "None"}</p>
             <p><strong>Idea:</strong> {project.idea || "No idea yet"}</p>
-            <p><strong>Deadlines:</strong> {project.deadlines.join(", ") || "No deadlines set"}</p>
-            <div className="project-list-buttons">
+
+            {/* Render the Timeline */}
+            <p><strong>Timeline:</strong></p>
+            <Timeline deadlines={project.deadlines} />
+
+            <div style={{ display: "flex", gap: "10px" }}>
               <button onClick={() => handleEditProject(project)}>Edit</button>
-              <button onClick={() => handleDeleteProject(project._id)}>Delete</button>
+              <button onClick={() => handleDeleteProject(project._id)}>
+                Delete
+              </button>
             </div>
           </div>
         ))}
