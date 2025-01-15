@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 export default function GalleryPage() {
   const [artworks, setArtworks] = useState([]);
   const [newArtwork, setNewArtwork] = useState({ title: "", image: "" });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentArtwork, setCurrentArtwork] = useState(null);
 
   // Fetch artworks from the API
   useEffect(() => {
@@ -36,25 +38,30 @@ export default function GalleryPage() {
     setArtworks(artworks.filter((art) => art._id !== id));
   };
 
-  // Edit artwork title
-  const handleEditArtwork = async (id) => {
-    const updatedTitle = prompt("Edit Title:", artworks.find((art) => art._id === id).title);
-    if (!updatedTitle) return;
+  // Open modal for editing
+  const handleEditArtwork = (art) => {
+    setCurrentArtwork(art);
+    setIsModalOpen(true);
+  };
 
+  // Update artwork title
+  const handleUpdateArtwork = async () => {
     const response = await fetch("/api/artworks", {
-      method: "PUT", // Assuming a PUT method is defined in the API for updating
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, title: updatedTitle }),
+      body: JSON.stringify({ id: currentArtwork._id, title: currentArtwork.title }),
     });
     const updatedArtwork = await response.json();
-
-    setArtworks(artworks.map((art) => (art._id === id ? updatedArtwork : art)));
+    setArtworks(artworks.map((art) => (art._id === updatedArtwork._id ? updatedArtwork : art)));
+    setIsModalOpen(false);
+    setCurrentArtwork(null);
   };
+
 
   return (
     <div>
       <h1>Gallery</h1>
-      <form onSubmit={handleAddArtwork}>
+      <form onSubmit={handleAddArtwork} className="upload-form">
         <input
           type="text"
           name="title"
@@ -71,18 +78,37 @@ export default function GalleryPage() {
         />
         <button type="submit">Add Artwork</button>
       </form>
-      <div>
+      <div className="gallery-container">
         {artworks.map((art) => (
-          <div key={art._id}>
+          <div key={art._id} className="gallery-item">
             <img src={art.image} alt={art.title} />
             <p>{art.title}</p>
-            <div style={{ display: "flex", gap: "10px" }}>
-              <button onClick={() => handleEditArtwork(art._id)}>Edit</button>
+            <div className="gallery-actions">
+              <button onClick={() => handleEditArtwork(art)}>Edit</button>
               <button onClick={() => handleDeleteArtwork(art._id)}>Delete</button>
             </div>
           </div>
         ))}
       </div>
+
+      {isModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Edit Artwork</h2>
+            <input
+              type="text"
+              value={currentArtwork.title}
+              onChange={(e) =>
+                setCurrentArtwork({ ...currentArtwork, title: e.target.value })
+              }
+            />
+            <div className="modal-actions">
+              <button onClick={handleUpdateArtwork}>Save</button>
+              <button onClick={() => setIsModalOpen(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

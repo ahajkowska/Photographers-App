@@ -1,6 +1,7 @@
 // app/layout.js
 import "../styles/globals.css";
 import "../styles/components.css";
+import "../styles/gallery.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
