@@ -1,5 +1,5 @@
 {
-  "name": "aplikacja-pisarzy",
+  "name": "painters-app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,12 +11,10 @@
   "dependencies": {
     "next": "15.1.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-router-dom": "^7.1.1"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.5.1",
-    "tailwindcss": "^3.4.17"
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1"
   }
 }
