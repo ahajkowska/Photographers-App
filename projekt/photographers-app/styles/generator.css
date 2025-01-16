@@ -1,0 +1,49 @@
+.idea-generator-page {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--text-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.idea-generator-page h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--text-color);
+}
+
+.generator-section {
+  margin-bottom: 20px;
+}
+
+.generator-section h2 {
+  font-size: 1.5rem;
+  color: var(--text-color);
+}
+
+.generator-section button {
+  padding: 10px 15px;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.generator-section button:hover {
+  opacity: 0.9;
+}
+
+.generator-section p {
+  margin-top: 10px;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.generator-section div {
+  text-align: center;
+  border-radius: 4px;
+}
