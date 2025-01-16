@@ -5,7 +5,7 @@ import React from "react";
 export default function Timeline({ deadlines }) {
   // Sort deadlines by date
   const sortedDeadlines = deadlines
-    .filter((d) => d.date) // Ensure no null dates
+    .filter((d) => d.date) // no null dates
     .sort((a, b) => new Date(a.date) - new Date(b.date));
 
   return (

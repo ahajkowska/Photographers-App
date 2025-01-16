@@ -90,6 +90,7 @@ export default function ProjectsPage() {
             equipment: [""],
             idea: "",
             deadlines: [{ date: null, description: "" }],
+            images: [{ title: "", url: "" }],
           }
         }
         enableReinitialize
@@ -193,6 +194,37 @@ export default function ProjectsPage() {
               </FieldArray>
             </div>
 
+            {/* Images Section */}
+            <div>
+              <label>Images</label>
+              <FieldArray name="images">
+                {({ push, remove }) => (
+                  <div>
+                    {values.images.map((image, index) => (
+                      <div key={index} style={{ display: "flex", gap: "10px" }}>
+                        <Field
+                          name={`images[${index}].title`}
+                          placeholder="Image Title"
+                          className="form-field"
+                        />
+                        <Field
+                          name={`images[${index}].url`}
+                          placeholder="Image URL"
+                          className="form-field"
+                        />
+                        <button type="button" onClick={() => remove(index)}>
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                    <button type="button" onClick={() => push({ title: "", url: "" })}>
+                      Add Image
+                    </button>
+                  </div>
+                )}
+              </FieldArray>
+            </div>
+
             {/* Submit Button */}
             <button type="submit" className="form-submit">
               {isEditing ? "Update Project" : "Add Project"}
@@ -213,11 +245,20 @@ export default function ProjectsPage() {
             <p><strong>Timeline:</strong></p>
             <Timeline deadlines={project.deadlines} />
 
+            {/* Image Cards */}
+            <p><strong>Images:</strong></p>
+            <div className="image-cards">
+                {project.images.map((image, i) => (
+                <div key={i} className="image-card">
+                    <img src={image.url} alt={image.title} />
+                    <p>{image.title}</p>
+                </div>
+                ))}
+            </div>
+
             <div style={{ display: "flex", gap: "10px" }}>
               <button onClick={() => handleEditProject(project)}>Edit</button>
-              <button onClick={() => handleDeleteProject(project._id)}>
-                Delete
-              </button>
+              <button onClick={() => handleDeleteProject(project._id)}>Delete</button>
             </div>
           </div>
         ))}

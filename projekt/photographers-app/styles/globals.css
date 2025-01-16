@@ -2,48 +2,109 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, sans-serif;
-}
-/* ==== */
-
+/* Reset Styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-
+/* Global Styles */
 body {
   font-family: Arial, sans-serif;
   line-height: 1.6;
   margin: 0;
   padding: 0;
-  background-color: #f9f9f9;
-  color: #333;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-a {
+/* Theme Classes */
+.theme-light {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --card-bg: #f9f9f9;
+  --button-bg: #0070f3;
+  --button-text: #ffffff;
+}
+
+.theme-dark {
+  --bg-color: #181818;
+  --text-color: #8f8f8f;
+  --card-bg: #252525;
+  --button-bg: #1e90ff;
+  --button-text: #ffffff;
+}
+
+/* Links */
+/* a {
   text-decoration: none;
   color: #0070f3;
 }
 
 a:hover {
   text-decoration: underline;
-}
+} */
 
+/* Lists */
 ul {
   list-style: none;
   padding: 0;
 }
 
+/* Main Content */
 main {
   padding: 20px;
+}
+
+/* Project Card */
+.project-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--text-color);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Buttons */
+button {
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.theme-toggle-button {
+  font-size: 13px;
+  margin: 10px;
+}
+
+.homepage {
+  background-color: var(--card-bg);
+  text-align: center;
+  padding: 50px 20px;
+  margin-bottom: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.homepage h1 {
+  font-size: 2.5rem;
+  color: var(--text-color);
+  margin-bottom: 10px;
+}
+
+.homepage p {
+  font-size: 1.2rem;
+  color: var(--text-color);
+  margin-bottom: 20px;
 }
