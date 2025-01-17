@@ -12,7 +12,8 @@ function Navbar() {
         <li><Link href="/">Home</Link></li>
         <li><Link href="/projects">Projects</Link></li>
         <li><Link href="/gallery">Gallery</Link></li>
-        <li><a href="/idea-generator">Idea Generator</a></li>
+        <li><Link href="/idea-generator">Idea Generator</Link></li>
+        <li><Link href="/tasks">Tasks</Link></li>
       </ul>
     </nav>
   );

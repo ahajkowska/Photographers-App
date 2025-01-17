@@ -1,0 +1,50 @@
+.task-page {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.task-page h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.task-page select,
+.task-page textarea,
+.task-page input {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid var(--text-color);
+  border-radius: 4px;
+}
+
+.task-page button {
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.task-page .task-item.completed input[type="text"],
+.task-page ul li.completed {
+  text-decoration: line-through;
+  color: gray;
+}
+
+.task-page .task-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.task-page .task-item input[type="text"] {
+  flex: 1;
+  padding: 5px;
+}
