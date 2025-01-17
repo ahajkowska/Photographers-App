@@ -2,11 +2,11 @@ export const templates = {
     "Portrait Session": {
       tasks: [
         "Set up lighting for soft shadows",
-        "Choose a backdrop or outdoor location",
+        "Choose a location with good lightning",
         "Guide the subject on posing",
       ],
       equipment: [
-        "Camera with portrait lens (50mm or 85mm)",
+        "Camera with portrait lens",
         "Softbox or reflector",
         "Tripod for stability",
       ],
@@ -16,10 +16,9 @@ export const templates = {
         "Capture the bride and groom getting ready",
         "Photograph the ceremony and ring exchange",
         "Take family portraits after the ceremony",
-        "Document the reception and candid moments",
       ],
       equipment: [
-        "Full-frame camera with 24-70mm lens",
+        "Full-frame camera",
         "Flash for low-light conditions",
         "Extra batteries and memory cards",
       ],
@@ -33,19 +32,15 @@ export const templates = {
       equipment: [
         "Macro lens for close-up shots",
         "Lightbox or soft lighting setup",
-        "Tripod for consistent framing",
       ],
     },
     "Landscape Session": {
       tasks: [
         "Scout the location during golden hour",
-        "Set up the tripod for long exposures",
         "Capture multiple angles of the landscape",
       ],
       equipment: [
         "Wide-angle lens",
-        "Tripod with ball head",
-        "ND filters for long exposures",
       ],
     },
   };
