@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 export default function GalleryPage() {
   const [photos, setPhotos] = useState([]);
   const [newPhoto, setNewPhoto] = useState({ title: "", image: "", tags: [] });
+  const [photoComments, setPhotoComments] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPhoto, setCurrentPhoto] = useState(null);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
@@ -92,7 +93,38 @@ export default function GalleryPage() {
     setCurrentPhoto(null);
   };
 
-  // == filter photos by tags ==
+  // == comments ==
+  const handleAddComment = async (photoId) => {
+    const commentText = photoComments[photoId];
+    if (!commentText?.trim()) {
+      alert("Comment cannot be empty");
+      return;
+    }
+  
+    const response = await fetch(`/api/photos/${photoId}/comments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: loggedInUserId,
+        username: localStorage.getItem("username"),
+        text: commentText,
+      }),
+    });
+  
+    if (response.ok) {
+      const updatedPhoto = await response.json();
+      setPhotos(
+        photos.map((photo) =>
+          photo._id === updatedPhoto._id ? updatedPhoto : photo
+        )
+      );
+      setPhotoComments({ ...photoComments, [photoId]: "" }); // Clear the input for this photo
+    } else {
+      console.error("Failed to add comment");
+    }
+  };  
+
+  // == filter photos ==
   const filteredPhotos = searchTag
     ? photos.filter((photo) => {
         const lowerCaseSearch = searchTag.toLowerCase();
@@ -142,6 +174,33 @@ export default function GalleryPage() {
             <img src={photo.imageUrl} alt={photo.title} />
             <p>{photo.title}</p>
             <p>Tags: {photo.tags.join(", ")}</p>
+
+            {/* Comments */}
+            <div className="comments">
+              <h4>Comments</h4>
+              <ul>
+                {photo.comments.map((comment) => (
+                  <li key={comment._id}>
+                    <strong>{comment.username}:</strong> {comment.text}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="add-comment">
+              <input
+                type="text"
+                placeholder="Add a comment"
+                value={photoComments[photo._id] || ""}
+                onChange={(e) =>
+                  setPhotoComments({
+                    ...photoComments,
+                    [photo._id]: e.target.value,
+                  })
+                }
+              />
+              <button onClick={() => handleAddComment(photo._id)}>Post</button>
+            </div>
+
             {photo.userId === loggedInUserId && (
               <div className="gallery-actions">
                 <button onClick={() => handleEditPhoto(photo)}>Edit</button>

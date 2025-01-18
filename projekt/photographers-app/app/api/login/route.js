@@ -27,7 +27,7 @@ export async function POST(req) {
 
     // Return the userId instead of a JWT token
     return new Response(
-      JSON.stringify({ message: "Login successful", userId: user._id.toString() }),
+      JSON.stringify({ message: "Login successful", userId: user._id.toString(), username: user.username }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {

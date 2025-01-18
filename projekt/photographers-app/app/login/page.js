@@ -29,13 +29,13 @@ export default function LoginPage() {
         throw new Error(error);
       }
 
-      const { userId } = await response.json();
+      const { userId, username } = await response.json();
       localStorage.setItem("userId", userId);
-
+      localStorage.setItem("username", username);
+      
       setMessage("Login successful!");
       setFormData({ email: "", password: "" });
 
-      // Redirect to a protected page or dashboard
       router.push("/");
     } catch (error) {
       setMessage(error.message);
