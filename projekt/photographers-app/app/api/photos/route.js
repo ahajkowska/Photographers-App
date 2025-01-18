@@ -5,13 +5,13 @@ export async function POST(req) {
   await dbConnect();
 
   try {
-    const { title, imageUrl, userId } = await req.json();
+    const { title, imageUrl, userId, tags } = await req.json();
 
     if (!userId || !title || !imageUrl) {
       return new Response("Invalid input", { status: 400 });
     }
 
-    const newPhoto = await Photo.create({ title, imageUrl, userId });
+    const newPhoto = await Photo.create({ title, imageUrl, userId, tags: tags || [] });
     console.log("Photo Created Successfully:", newPhoto);
 
     return new Response(JSON.stringify(newPhoto), { status: 201 });
