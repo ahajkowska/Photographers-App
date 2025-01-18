@@ -1,4 +1,4 @@
-export const templates = {
+export const defaultTemplates = {
     "Portrait Session": {
       tasks: [
         "Set up lighting for soft shadows",

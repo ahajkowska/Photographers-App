@@ -1,40 +1,111 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { templates } from "../../lib/templates";
+import { defaultTemplates } from "../../lib/templates";
 
 export default function TaskPage() {
   const [taskLists, setTaskLists] = useState([]);
+  const [templates, setTemplates] = useState([]); // User-defined templates
   const [selectedTemplate, setSelectedTemplate] = useState("Portrait Session");
   const [title, setTitle] = useState("");
   const [tasks, setTasks] = useState([]);
   const [equipment, setEquipment] = useState([]);
   const [editingListId, setEditingListId] = useState(null);
+  
+  const [newTemplateName, setNewTemplateName] = useState("");
+  const [newTemplateTasks, setNewTemplateTasks] = useState([]);
+  const [newTemplateEquipment, setNewTemplateEquipment] = useState([]);
+
+  const fetchTemplates = async () => {
+    const userId = localStorage.getItem("userId");
+
+    if (!userId) {
+      console.error("User ID not found in localStorage");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/templates?userId=${userId}`);
+      const customTemplates = await response.json();
+
+      // Combine default and custom templates
+      const combinedTemplates = [
+        ...Object.keys(defaultTemplates).map((key) => ({
+          name: key,
+          tasks: defaultTemplates[key].tasks.map((text) => ({ text })),
+          equipment: defaultTemplates[key].equipment.map((item) => ({ name: item })),
+          isDefault: true,
+        })),
+        ...customTemplates,
+      ];
+
+      setTemplates(combinedTemplates);
+    } catch (error) {
+      console.error("Failed to fetch templates:", error);
+    }
+  };
 
   const fetchTasks = async () => {
-    const response = await fetch("/api/tasks");
+    const userId = localStorage.getItem("userId");
+
+    if (!userId) {
+      console.error("User ID not found in localStorage");
+      return;
+    }
+    
+    const response = await fetch(`/api/tasks?userId=${userId}`);
     const data = await response.json();
     setTaskLists(data);
   };
 
-  const handleTemplateSelect = (template) => {
-    const selectedTemplateData = templates[template];
-    if (!selectedTemplateData) {
-      console.error("Template not found:", template);
-      setTasks([]);
-      setEquipment([]);
+  const handleTemplateSelect = (templateName) => {
+    const selectedTemplate = templates.find((t) => t.name === templateName);
+
+    if (!selectedTemplate) {
+      console.error("Template not found:", templateName);
       return;
     }
 
-    setSelectedTemplate(template);
-    setTasks(
-      selectedTemplateData.tasks.map((text) => ({
-        text,
-        isCompleted: false,
-        format: "plain",
-      }))
-    );
-    setEquipment(selectedTemplateData.equipment || []);
+    setSelectedTemplate(templateName);
+    setTasks(selectedTemplate.tasks.map((task) => ({ ...task, isCompleted: false })));
+    setEquipment(selectedTemplate.equipment.map((item) => ({ ...item, isCompleted: false })));
+  };
+
+  // Save a custom template
+  const saveTemplate = async () => {
+    const userId = localStorage.getItem("userId");
+
+    if (!userId) {
+      console.error("User ID not found in localStorage");
+      return;
+    }
+
+    const newTemplate = {
+      name: newTemplateName,
+      tasks: newTemplateTasks.map((task) => ({ text: task.text || "" })),
+      equipment: newTemplateEquipment.map((item) => ({ name: item || "" })),
+      userId,
+    };
+
+    try {
+      const response = await fetch("/api/templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newTemplate),
+      });
+
+      if (response.ok) {
+        const savedTemplate = await response.json();
+        setTemplates([...templates, savedTemplate]);
+        setNewTemplateName("");
+        setNewTemplateTasks([]);
+        setNewTemplateEquipment([]);
+      } else {
+        console.error("Failed to save template");
+      }
+    } catch (error) {
+      console.error("Error saving template:", error);
+    }
   };
 
   const handleTaskCompletion = (index) => {
@@ -43,10 +114,10 @@ export default function TaskPage() {
     setTasks(updatedTasks);
   };
 
-  const handleTaskFormatting = (index, format) => {
-    const updatedTasks = [...tasks];
-    updatedTasks[index].format = format;
-    setTasks(updatedTasks);
+  const handleEquipmentCompletion = (index) => {
+    const updatedEquipment = [...equipment];
+    updatedEquipment[index].isCompleted = !updatedEquipment[index].isCompleted;
+    setEquipment(updatedEquipment);
   };
 
   const handleAddTask = () => {
@@ -67,6 +138,13 @@ export default function TaskPage() {
     setEquipment(updatedEquipment);
   };
   const saveTaskList = async () => {
+    const userId = localStorage.getItem("userId");
+
+    if (!userId) {
+      console.error("User ID not found in localStorage");
+      return;
+    }
+    
     if (editingListId) {
       // update existing task list
       const response = await fetch(`/api/tasks/${editingListId}`, {
@@ -89,7 +167,7 @@ export default function TaskPage() {
       const response = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, sessionType: selectedTemplate, tasks, equipment }),
+        body: JSON.stringify({ title, sessionType: selectedTemplate, tasks, equipment, userId }),
       });
 
       if (response.ok) {
@@ -104,7 +182,6 @@ export default function TaskPage() {
     setEquipment([]);
   };
 
-  
   const editTaskList = (list) => {
     setEditingListId(list._id);
     setTitle(list.title);
@@ -121,20 +198,70 @@ export default function TaskPage() {
   };
 
   useEffect(() => {
-    fetchTasks();
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      window.location.href = "/login";
+    } else {
+      fetchTemplates();
+      fetchTasks();
+    }
   }, []);
 
   return (
     <div className="task-page">
       <h1>Task Manager</h1>
 
+      {/* Create New Template */}
+      <div className="template-editor">
+        <h3>Create New Template</h3>
+        <input
+          type="text"
+          placeholder="Template Name"
+          value={newTemplateName}
+          onChange={(e) => setNewTemplateName(e.target.value)}
+        />
+        <h4>Tasks</h4>
+        {newTemplateTasks.map((task, idx) => (
+          <div key={idx}>
+            <input
+              type="text"
+              value={task.text}
+              onChange={(e) => {
+                const updatedTasks = [...newTemplateTasks];
+                updatedTasks[idx].text = e.target.value;
+                setNewTemplateTasks(updatedTasks);
+              }}
+            />
+          </div>
+        ))}
+        <button onClick={() => setNewTemplateTasks([...newTemplateTasks, { text: "" }])}>Add Task</button>
+
+        <h4>Equipment</h4>
+        {newTemplateEquipment.map((item, idx) => (
+          <div key={idx}>
+            <input
+              type="text"
+              value={item}
+              onChange={(e) => {
+                const updatedEquipment = [...newTemplateEquipment];
+                updatedEquipment[idx] = e.target.value;
+                setNewTemplateEquipment(updatedEquipment);
+              }}
+            />
+          </div>
+        ))}
+        <button onClick={() => setNewTemplateEquipment([...newTemplateEquipment, ""])}>Add Equipment</button>
+
+        <button onClick={saveTemplate}>Save Template</button>
+      </div>
+
       {/* Templates */}
       <div>
         <h2>Select a Template</h2>
         <select onChange={(e) => handleTemplateSelect(e.target.value)} value={selectedTemplate}>
-          {Object.keys(templates).map((template) => (
-            <option key={template} value={template}>
-              {template}
+          {templates.map((template) => (
+            <option key={template.name} value={template.name}>
+              {template.isDefault ? `Default: ${template.name}` : `Custom: ${template.name}`}
             </option>
           ))}
         </select>
@@ -167,12 +294,7 @@ export default function TaskPage() {
                 setTasks(updatedTasks);
               }}
             />
-            <div className="task-toolbar">
-              <button onClick={() => handleTaskFormatting(index, "plain")}>Plain</button>
-              <button onClick={() => handleTaskFormatting(index, "bullet")}>Bullet</button>
-              <button onClick={() => handleTaskFormatting(index, "numbered")}>Numbered</button>
-              <button onClick={() => handleDeleteTask(index)}>Delete Task</button>
-            </div>
+            <button onClick={() => handleDeleteTask(index)}>Delete Task</button>
           </div>
         ))}
         <button onClick={handleAddTask}>Add Task</button>
@@ -181,24 +303,30 @@ export default function TaskPage() {
         {equipment.map((item, index) => (
           <div key={index} className="equipment-item">
             <input
+              type="checkbox"
+              checked={item.isCompleted}
+              onChange={() => handleEquipmentCompletion(index)}
+            />
+            <input
               type="text"
-              value={item}
+              value={item.name}
               onChange={(e) => {
                 const updatedEquipment = [...equipment];
-                updatedEquipment[index] = e.target.value;
+                updatedEquipment[index].name = e.target.value;
                 setEquipment(updatedEquipment);
               }}
             />
             <button onClick={() => handleDeleteEquipment(index)}>Delete Equipment</button>
           </div>
         ))}
-        <button onClick={handleAddEquipment}>Add Equipment</button>
-
-        <button onClick={saveTaskList}>{editingListId ? "Update Task List" : "Save Task List"}</button>
+        <div className="equipment-buttons">
+          <button onClick={handleAddEquipment}>Add Equipment</button>
+          <button onClick={saveTaskList}>{editingListId ? "Update Task List" : "Save Task List"}</button>
+        </div>
       </div>
 
       {/* Task List Viewer */}
-      <div>
+      <div className="task-viewer">
         <h2>Saved Task Lists</h2>
         {taskLists.map((list) => (
           <div key={list._id}>
@@ -207,11 +335,7 @@ export default function TaskPage() {
               {list.tasks.map((task, idx) => (
                 <li key={idx} className={task.isCompleted ? "completed" : ""}>
                   <input type="checkbox" checked={task.isCompleted} readOnly />
-                  <div>
-                    {task.format === "bullet" && <span>•</span>}
-                    {task.format === "numbered" && <span>{idx + 1}.</span>}
-                    {task.text}
-                  </div>
+                  <span>{task.text}</span>
                 </li>
               ))}
             </ul>
@@ -220,7 +344,10 @@ export default function TaskPage() {
             <ul>
               {Array.isArray(list.equipment) && list.equipment.length > 0 ? (
                 list.equipment.map((item, idx) => (
-                  <li key={idx}>{item}</li>
+                  <li key={idx} className={item.isCompleted ? "completed" : ""}>
+                    <input type="checkbox" checked={item.isCompleted} readOnly />
+                    <span>{item.name}</span>
+                  </li>
                 ))
               ) : (
                 <li>No equipment specified</li>

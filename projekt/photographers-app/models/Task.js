@@ -9,7 +9,13 @@ const TaskSchema = new mongoose.Schema({
       isCompleted: { type: Boolean, default: false },
     },
   ],
-  equipment: [{ type: String }],
+  equipment: [
+    {
+      name: { type: String, required: true }, // Equipment name
+      isCompleted: { type: Boolean, default: false }, // Whether equipment is prepared/used
+    },
+  ],
+  userId: { type: mongoose.Schema.Types.ObjectId, required: true }, // Reference to the user
   createdAt: { type: Date, default: Date.now },
 });
 

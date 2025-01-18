@@ -6,13 +6,14 @@ export async function POST(req) {
   await dbConnect();
 
   try {
-    const { title, sessionType, tasks, equipment } = await req.json();
+    const { title, sessionType, tasks, equipment, userId } = await req.json();
 
     const newTaskList = await Task.create({
       title,
       sessionType,
       tasks,
-      equipment: equipment || [],
+      equipment,
+      userId,
     });
 
     return new Response(JSON.stringify(newTaskList), { status: 201 });
@@ -27,7 +28,14 @@ export async function GET(req) {
   await dbConnect();
 
   try {
-    const taskLists = await Task.find({});
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
+
+    if (!userId) {
+      return new Response("User ID is required", { status: 400 });
+    }
+
+    const taskLists = await Task.find({ userId });
     return new Response(JSON.stringify(taskLists), { status: 200 });
   } catch (error) {
     console.error("Error fetching task lists:", error);

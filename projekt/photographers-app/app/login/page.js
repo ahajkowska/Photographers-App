@@ -29,8 +29,9 @@ export default function LoginPage() {
         throw new Error(error);
       }
 
-      const { token } = await response.json();
-      localStorage.setItem("token", token); // Store the JWT in localStorage
+      const { userId } = await response.json();
+      localStorage.setItem("userId", userId);
+
       setMessage("Login successful!");
       setFormData({ email: "", password: "" });
 
