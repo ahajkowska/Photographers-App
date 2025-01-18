@@ -12,7 +12,7 @@ import ThemeToggle from "../components/ThemeToggle";
 
 export const metadata = {
   title: "Photographers App",
-  description: "Your app for managing art projects and galleries.",
+  description: "Your app for managing photo projects and galleries.",
 };
 
 export default function RootLayout({ children }) {
