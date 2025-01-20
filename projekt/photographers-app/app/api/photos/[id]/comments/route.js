@@ -32,3 +32,31 @@ export async function POST(req, { params }) {
     return new Response(`Failed to add comment: ${error.message}`, { status: 500 });
   }
 }
+
+export async function DELETE(req, { params }) {
+  await dbConnect();
+
+  try {
+    const { photoId, commentId, userId } = await req.json();
+
+    // Znajdź zdjęcie i usuń komentarz
+    const updatedPhoto = await Photo.findByIdAndUpdate(
+      photoId,
+      {
+        $pull: {
+          comments: { _id: commentId, userId }, // Usuń tylko jeśli komentarz należy do użytkownika
+        },
+      },
+      { new: true }
+    );
+
+    if (!updatedPhoto) {
+      return new Response("Photo or comment not found", { status: 404 });
+    }
+
+    return new Response(JSON.stringify(updatedPhoto), { status: 200 });
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    return new Response(`Failed to delete comment: ${error.message}`, { status: 500 });
+  }
+}

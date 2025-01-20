@@ -197,3 +197,37 @@
 .add-comment button:hover {
   background-color: #0056b3;
 }
+
+/* Sekcja statystyk */
+.statistics {
+  background-color: #ffffff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.statistics h2 {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+}
+
+.statistics p {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+.delete-comment-button {
+  margin-left: 10px;
+  background-color: #dc3545;
+  color: #ffffff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background-color 0.3s ease;
+}
+
+.delete-comment-button:hover {
+  background-color: #c82333;
+}

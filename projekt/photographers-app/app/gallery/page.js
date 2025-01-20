@@ -10,6 +10,7 @@ export default function GalleryPage() {
   const [currentPhoto, setCurrentPhoto] = useState(null);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [searchTag, setSearchTag] = useState("");
+  const [statistics, setStatistics] = useState({ totalPhotos: 0, totalComments: 0, topUser: null });
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
@@ -17,7 +18,6 @@ export default function GalleryPage() {
     fetchPhotos();
   }, []);
 
-  // Fetch photos from the backend
   const fetchPhotos = async () => {
     try {
       const response = await fetch("/api/photos");
@@ -26,9 +26,29 @@ export default function GalleryPage() {
       }
       const data = await response.json();
       setPhotos(data);
+      calculateStatistics(data);
     } catch (error) {
       console.error("Error fetching photos:", error.message);
     }
+  };
+
+  const calculateStatistics = (photos) => {
+    const totalPhotos = photos.length;
+  
+    const totalComments = photos.reduce((sum, photo) => sum + photo.comments.length, 0);
+  
+    const userPhotoCounts = photos.reduce((acc, photo) => {
+      const username = localStorage.getItem("username") || "Unknown User";
+      acc[username] = (acc[username] || 0) + 1;
+      return acc;
+    }, {});
+  
+    const topUser = Object.entries(userPhotoCounts).reduce(
+      (top, [username, count]) => (count > top.count ? { username, count } : top),
+      { username: null, count: 0 }
+    );
+  
+    setStatistics({ totalPhotos, totalComments, topUser });
   };
 
   // Add new photo
@@ -54,6 +74,7 @@ export default function GalleryPage() {
       const savedPhoto = await response.json();
       setPhotos([...photos, savedPhoto]);
       setNewPhoto({ title: "", image: "", tags: [] }); // Reset form
+      calculateStatistics([...photos, savedPhoto]); // Update statistics    
     } else {
       console.error("Failed to add photo");
     }
@@ -124,6 +145,34 @@ export default function GalleryPage() {
     }
   };  
 
+  const handleDeleteComment = async (photoId, commentId) => {
+    try {
+      const response = await fetch(`/api/photos/${photoId}/comments`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          photoId,
+          commentId,
+          userId: localStorage.getItem("userId"),
+        }),
+      });
+  
+      if (response.ok) {
+        const updatedPhoto = await response.json();
+        setPhotos(
+          photos.map((photo) =>
+            photo._id === updatedPhoto._id ? updatedPhoto : photo
+          )
+        );
+      } else {
+        console.error("Failed to delete comment");
+      }
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
+  };
+  
+
   // == filter photos ==
   const filteredPhotos = searchTag
     ? photos.filter((photo) => {
@@ -182,6 +231,14 @@ export default function GalleryPage() {
                 {photo.comments.map((comment) => (
                   <li key={comment._id}>
                     <strong>{comment.username}:</strong> {comment.text}
+                    {comment.userId === loggedInUserId && (
+                      <button
+                        onClick={() => handleDeleteComment(photo._id, comment._id)}
+                        className="delete-comment-button"
+                      >
+                        Delete
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -236,6 +293,17 @@ export default function GalleryPage() {
           </div>
         </div>
       )}
+
+      <div className="statistics">
+        <h2>Gallery Statistics</h2>
+        <p>Total Photos: {statistics.totalPhotos}</p>
+        <p>Total Comments: {statistics.totalComments}</p>
+        {statistics.topUser && (
+          <p>
+            User with the most photos posted: {statistics.topUser.username} ({statistics.topUser.count} photos)
+          </p>
+        )}
+      </div>
     </div>
   );
 }

@@ -53,8 +53,8 @@ export async function DELETE(req, { params }) {
       return new Response(JSON.stringify({ error: error.message }), { status: 500 });
     }
   }
-  
-  export async function PUT(req, { params }) {
+
+export async function PUT(req, { params }) {
     await dbConnect();
   
     try {
