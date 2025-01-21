@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 const PhotoSchema = new mongoose.Schema({
   title: { type: String, required: true },
   imageUrl: { type: String, required: true },
-  userId: { type: mongoose.Schema.Types.ObjectId, required: true }, // Reference to the user
+  userId: { type: mongoose.Schema.Types.ObjectId, required: true },
+  username: { type: String },
   tags: { type: [String], default: [] },
   comments: [
     {

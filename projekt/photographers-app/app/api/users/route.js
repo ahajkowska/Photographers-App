@@ -43,3 +43,16 @@ export async function POST(req) {
     return new Response(`Failed to register user: ${error.message}`, { status: 500 });
   }
 }
+
+
+export async function GET() {
+  await dbConnect();
+
+  try {
+    const users = await User.find({}, "userId username");
+
+    return new Response(JSON.stringify(users), { status: 200 });
+  } catch (error) {
+    return new Response(`Failed to fetch users: ${error.message}`, { status: 500 });
+  }
+}

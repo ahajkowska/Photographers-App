@@ -5,10 +5,9 @@ export async function POST(req, { params }) {
   await dbConnect();
 
   try {
-    const { id } = params; // Extract photo ID
+    const { id } = params;
     const { userId, username, text } = await req.json();
 
-    // Validate input
     if (!id || !userId || !text || !username) {
       return new Response("Invalid input", { status: 400 });
     }

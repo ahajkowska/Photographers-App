@@ -9,28 +9,68 @@ export default function GalleryPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPhoto, setCurrentPhoto] = useState(null);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
+  const [loggedInUsername, setLoggedInUsername] = useState(null);
   const [searchTag, setSearchTag] = useState("");
   const [statistics, setStatistics] = useState({ totalPhotos: 0, totalComments: 0, topUser: null });
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
-    setLoggedInUserId(userId);
-    fetchPhotos();
+    const initialize = async () => {
+      const userId = localStorage.getItem("userId");
+      const username = localStorage.getItem("username");
+      setLoggedInUserId(userId);
+      setLoggedInUsername(username);
+  
+      // Pobierz mapę użytkowników
+      const userMap = await fetchUsers();
+  
+      // Pobierz zdjęcia z uzupełnionym `username`
+      await fetchPhotos(userMap);
+    };
+  
+    initialize();
   }, []);
+  
 
-  const fetchPhotos = async () => {
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch("/api/users", {
+        method: "GET",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+  
+      const users = await response.json();
+      return users.reduce((map, user) => {
+        map[user._id] = user.username; // Mapowanie _id → username
+        return map;
+      }, {});
+    } catch (error) {
+      console.error("Error fetching users:", error.message);
+      return {};
+    }
+  };
+
+  const fetchPhotos = async (userMap) => {
     try {
       const response = await fetch("/api/photos");
       if (!response.ok) {
         throw new Error("Failed to fetch photos");
       }
-      const data = await response.json();
-      setPhotos(data);
-      calculateStatistics(data);
+      const photos = await response.json();
+  
+      // Uzupełnij `username` na podstawie mapy
+      const updatedPhotos = photos.map((photo) => ({
+        ...photo,
+        username: userMap[photo.userId] || "Anonymous",
+      }));
+  
+      setPhotos(updatedPhotos);
+      calculateStatistics(updatedPhotos);
     } catch (error) {
       console.error("Error fetching photos:", error.message);
     }
-  };
+  };  
 
   const calculateStatistics = (photos) => {
     const totalPhotos = photos.length;
@@ -38,7 +78,7 @@ export default function GalleryPage() {
     const totalComments = photos.reduce((sum, photo) => sum + photo.comments.length, 0);
   
     const userPhotoCounts = photos.reduce((acc, photo) => {
-      const username = localStorage.getItem("username") || "Unknown User";
+      const username = photo.username || "Anonymous";
       acc[username] = (acc[username] || 0) + 1;
       return acc;
     }, {});
@@ -67,14 +107,16 @@ export default function GalleryPage() {
         title: newPhoto.title,
         imageUrl: newPhoto.image,
         userId: loggedInUserId,
+        username: loggedInUsername,
         tags: newPhoto.tags,
       }),
     });
     if (response.ok) {
       const savedPhoto = await response.json();
+      const updatedPhoto = { ...savedPhoto, username: loggedInUsername };
       setPhotos([...photos, savedPhoto]);
       setNewPhoto({ title: "", image: "", tags: [] }); // Reset form
-      calculateStatistics([...photos, savedPhoto]); // Update statistics    
+      calculateStatistics([...photos, updatedPhoto]); // Update statistics    
     } else {
       console.error("Failed to add photo");
     }
@@ -127,7 +169,7 @@ export default function GalleryPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         userId: loggedInUserId,
-        username: localStorage.getItem("username"),
+        username: loggedInUsername,
         text: commentText,
       }),
     });
@@ -223,6 +265,9 @@ export default function GalleryPage() {
             <img src={photo.imageUrl} alt={photo.title} />
             <p>{photo.title}</p>
             <p>Tags: {photo.tags.join(", ")}</p>
+            <p>
+              Added by: <strong>{photo.username || "Anonymous"}</strong>
+            </p>
 
             {/* Comments */}
             <div className="comments">
