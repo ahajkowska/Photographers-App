@@ -214,7 +214,56 @@ export default function GalleryPage() {
     }
   };
   
-
+  const handleLikePhoto = async (photoId) => {
+    try {
+      const response = await fetch(`/api/photos/${photoId}/like`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: loggedInUserId }),
+      });
+  
+      if (response.ok) {
+        const updatedPhoto = await response.json();
+        setPhotos((prevPhotos) =>
+          prevPhotos.map((photo) =>
+            photo._id === updatedPhoto._id
+              ? { ...photo, ...updatedPhoto } // Merge updatedPhoto to preserve username
+              : photo
+          )
+        );
+      } else {
+        console.error("Failed to like photo");
+      }
+    } catch (error) {
+      console.error("Error liking photo:", error);
+    }
+  };
+  
+  const handleUnlikePhoto = async (photoId) => {
+    try {
+      const response = await fetch(`/api/photos/${photoId}/like`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: loggedInUserId }),
+      });
+  
+      if (response.ok) {
+        const updatedPhoto = await response.json();
+        setPhotos((prevPhotos) =>
+          prevPhotos.map((photo) =>
+            photo._id === updatedPhoto._id
+              ? { ...photo, ...updatedPhoto } // Merge updatedPhoto to preserve username
+              : photo
+          )
+        );
+      } else {
+        console.error("Failed to unlike photo");
+      }
+    } catch (error) {
+      console.error("Error unliking photo:", error);
+    }
+  };
+  
   // == filter photos ==
   const filteredPhotos = searchTag
     ? photos.filter((photo) => {
@@ -264,6 +313,15 @@ export default function GalleryPage() {
           <div key={photo._id} className="gallery-item">
             <img src={photo.imageUrl} alt={photo.title} />
             <p>{photo.title}</p>
+            <div className="photo-likes">
+            <p>{photo.likes?.length || 0} Likes</p>
+            {photo.likes?.includes(loggedInUserId) ? (
+              <button onClick={() => handleUnlikePhoto(photo._id)}>Unlike</button>
+            ) : (
+              <button onClick={() => handleLikePhoto(photo._id)}>Like</button>
+            )}
+          </div>
+
             <p>Tags: {photo.tags.join(", ")}</p>
             <p>
               Added by: <strong>{photo.username || "Anonymous"}</strong>

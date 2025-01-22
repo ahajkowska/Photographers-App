@@ -231,3 +231,22 @@
 .delete-comment-button:hover {
   background-color: #c82333;
 }
+
+.photo-likes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.photo-likes button {
+  padding: 5px 10px;
+  border: none;
+  background-color: #0070f3;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.photo-likes button:hover {
+  background-color: #005bb5;
+}

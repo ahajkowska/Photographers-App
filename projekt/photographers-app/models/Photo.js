@@ -14,6 +14,7 @@ const PhotoSchema = new mongoose.Schema({
       createdAt: { type: Date, default: Date.now },
     },
   ],
+  likes: { type: [mongoose.Schema.Types.ObjectId], default: [] },
   createdAt: { type: Date, default: Date.now },
 });
 
