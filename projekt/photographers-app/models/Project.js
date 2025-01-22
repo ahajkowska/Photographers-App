@@ -16,6 +16,7 @@ const ProjectSchema = new mongoose.Schema({
       url: { type: String},
     },
   ],
+  userId: { type: mongoose.Schema.Types.ObjectId, required: true }, // Dodaj userId
 });
 
 export default mongoose.models.Project || mongoose.model("Project", ProjectSchema);

@@ -4,22 +4,42 @@ import { useState, useEffect } from "react";
 import { Formik, Form, Field, FieldArray } from "formik";
 import * as Yup from "yup";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css"; // Import the CSS for react-datepicker
-import Timeline from "../../components/Timeline"; // Import the Timeline component
+import "react-datepicker/dist/react-datepicker.css";
+import Timeline from "../../components/Timeline";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [currentProject, setCurrentProject] = useState(null);
+  const [loggedInUserId, setLoggedInUserId] = useState(null);
 
-  // Fetch Projects from Backend
+  // Upewnij się, że `localStorage` jest odczytany po stronie klienta
   useEffect(() => {
-    fetch("/api/projects")
-      .then((res) => res.json())
-      .then((data) => setProjects(data));
+    const userId = localStorage.getItem("userId");
+    setLoggedInUserId(userId);
+    fetchProjects(userId);
   }, []);
 
-  // Validation Schema
+  const fetchProjects = async (userId) => {
+    try {
+      const response = await fetch("/api/projects", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          userid: userId,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch projects");
+      }
+      const data = await response.json();
+      setProjects(data);
+    } catch (error) {
+      console.error("Error fetching projects:", error.message);
+    }
+  };
+
+  // Walidacja danych w formularzu
   const validationSchema = Yup.object().shape({
     title: Yup.string()
       .required("Project title is required")
@@ -37,30 +57,33 @@ export default function ProjectsPage() {
       .min(1, "You must add at least one deadline"),
   });
 
-  // Save Project (Add or Update)
   const handleSaveProject = async (values) => {
-    if (isEditing) {
-      const response = await fetch("/api/projects", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: currentProject._id, ...values }),
-      });
-      const updatedProject = await response.json();
-      setProjects(
-        projects.map((project) =>
-          project._id === updatedProject._id ? updatedProject : project
-        )
-      );
-      setIsEditing(false);
-      setCurrentProject(null);
-    } else {
-      const response = await fetch("/api/projects", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-      const newProject = await response.json();
-      setProjects([...projects, newProject]);
+    try {
+      if (isEditing) {
+        const response = await fetch("/api/projects", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: currentProject._id, userId: loggedInUserId, ...values }),
+        });
+        const updatedProject = await response.json();
+        setProjects(
+          projects.map((project) =>
+            project._id === updatedProject._id ? updatedProject : project
+          )
+        );
+        setIsEditing(false);
+        setCurrentProject(null);
+      } else {
+        const response = await fetch("/api/projects", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: loggedInUserId, ...values }),
+        });
+        const newProject = await response.json();
+        setProjects([...projects, newProject]);
+      }
+    } catch (error) {
+      console.error("Error saving project:", error.message);
     }
   };
 
@@ -70,16 +93,24 @@ export default function ProjectsPage() {
   };
 
   const handleDeleteProject = async (id) => {
-    await fetch("/api/projects", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    setProjects(projects.filter((project) => project._id !== id));
+    try {
+      const response = await fetch("/api/projects", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, userId: loggedInUserId }),
+      });
+      if (response.ok) {
+        setProjects(projects.filter((project) => project._id !== id));
+      } else {
+        console.error("Failed to delete project");
+      }
+    } catch (error) {
+      console.error("Error deleting project:", error.message);
+    }
   };
 
   return (
-    <div>
+    <div className="projects-page">
       <h1>Projects</h1>
 
       {/* Formik Form */}
@@ -248,12 +279,12 @@ export default function ProjectsPage() {
             {/* Image Cards */}
             <p><strong>Images:</strong></p>
             <div className="image-cards">
-                {project.images.map((image, i) => (
+              {project.images.map((image, i) => (
                 <div key={i} className="image-card">
-                    <img src={image.url} alt={image.title} />
-                    <p>{image.title}</p>
+                  <img src={image.url} alt={image.title} />
+                  <p>{image.title}</p>
                 </div>
-                ))}
+              ))}
             </div>
 
             <div style={{ display: "flex", gap: "10px" }}>

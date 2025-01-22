@@ -271,3 +271,10 @@ input {
 .search {
   width: 100%;
 }
+
+.gallery-page h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #0070f3;
+}
