@@ -61,11 +61,11 @@
 .upload-form {
   display: flex;
   gap: 10px;
-  margin-bottom: 20px;
+  margin: 20px auto;
   flex-wrap: wrap;
 }
 
-.upload-form input {
+input {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -249,4 +249,25 @@
 
 .photo-likes button:hover {
   background-color: #005bb5;
+}
+
+.sort-options {
+  margin-bottom: 20px;
+}
+
+.sort-options label {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.sort-options select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  flex: 1;
+  font-size: 1rem;
+}
+
+.search {
+  width: 100%;
 }

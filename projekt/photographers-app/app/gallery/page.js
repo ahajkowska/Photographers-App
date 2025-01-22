@@ -12,6 +12,7 @@ export default function GalleryPage() {
   const [loggedInUsername, setLoggedInUsername] = useState(null);
   const [searchTag, setSearchTag] = useState("");
   const [statistics, setStatistics] = useState({ totalPhotos: 0, totalComments: 0, topUser: null });
+  const [sortOption, setSortOption] = useState("likes");
 
   useEffect(() => {
     const initialize = async () => {
@@ -265,25 +266,56 @@ export default function GalleryPage() {
   };
   
   // == filter photos ==
-  const filteredPhotos = searchTag
-    ? photos.filter((photo) => {
-        const lowerCaseSearch = searchTag.toLowerCase();
-        return (
-          photo.title.toLowerCase().includes(lowerCaseSearch) ||
-          photo.tags.some((tag) => tag.toLowerCase().includes(lowerCaseSearch))
-        );
-      })
-    : photos;
+  const filterPhotos = (photos) => {
+    if (!searchTag.trim()) return photos;
+    const lowerCaseSearch = searchTag.toLowerCase();
+    return photos.filter((photo) =>
+      photo.title.toLowerCase().includes(lowerCaseSearch) ||
+      photo.tags.some((tag) => tag.toLowerCase().includes(lowerCaseSearch))
+    );
+  };
+  
+  // === sort photos ===
+  
+  const sortPhotos = (photos) => {
+    switch (sortOption) {
+      case "likes":
+        return [...photos].sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0));
+      case "comments":
+        return [...photos].sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0));
+      case "alphabetical":
+        return [...photos].sort((a, b) => a.title.localeCompare(b.title));
+      default:
+        return photos;
+    }
+  };
 
+  const filteredAndSortedPhotos = sortPhotos(filterPhotos(photos));
+  
   return (
     <div>
       <h1>Gallery</h1>
+      <div className="sort-options">
+        <label htmlFor="sort">Sort by:</label>
+        <select
+          id="sort"
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+        >
+          <option value="likes">Likes</option>
+          <option value="comments">Comments</option>
+          <option value="alphabetical">Alphabetically</option>
+        </select>
+      </div>
+
       <input
         type="text"
-        placeholder="Search"
+        placeholder="Search (by title or tag)"
         value={searchTag}
         onChange={(e) => setSearchTag(e.target.value)}
+        className="search"
       />
+      
       <form onSubmit={handleAddPhoto} className="upload-form">
         <input
           type="text"
@@ -309,7 +341,7 @@ export default function GalleryPage() {
         <button type="submit">Add Photo</button>
       </form>
       <div className="gallery-container">
-        {filteredPhotos.map((photo) => (
+        {filteredAndSortedPhotos.map((photo) => (
           <div key={photo._id} className="gallery-item">
             <img src={photo.imageUrl} alt={photo.title} />
             <p>{photo.title}</p>
