@@ -98,3 +98,18 @@ button:hover {
   color: var(--text-color);
   margin-bottom: 20px;
 }
+
+.gallery-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  font-size: 1.5rem;
+  color: #666;
+}
+
+.loading-indicator {
+  text-align: center;
+  color: #999;
+  font-size: 1rem;
+}

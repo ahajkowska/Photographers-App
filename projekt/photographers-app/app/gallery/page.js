@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 
 export default function GalleryPage() {
   const [photos, setPhotos] = useState([]);
+  const [photoLoadingStates, setPhotoLoadingStates] = useState({});
   const [newPhoto, setNewPhoto] = useState({ title: "", image: "", tags: [] });
   const [photoComments, setPhotoComments] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,6 +14,7 @@ export default function GalleryPage() {
   const [searchTag, setSearchTag] = useState("");
   const [statistics, setStatistics] = useState({ totalPhotos: 0, totalComments: 0, topUser: null });
   const [sortOption, setSortOption] = useState("likes");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const initialize = async () => {
@@ -21,11 +23,10 @@ export default function GalleryPage() {
       setLoggedInUserId(userId);
       setLoggedInUsername(username);
   
-      // Pobierz mapę użytkowników
       const userMap = await fetchUsers();
   
-      // Pobierz zdjęcia z uzupełnionym `username`
       await fetchPhotos(userMap);
+      setIsLoading(false); 
     };
   
     initialize();
@@ -43,7 +44,7 @@ export default function GalleryPage() {
   
       const users = await response.json();
       return users.reduce((map, user) => {
-        map[user._id] = user.username; // Mapowanie _id → username
+        map[user._id] = user.username;
         return map;
       }, {});
     } catch (error) {
@@ -60,13 +61,18 @@ export default function GalleryPage() {
       }
       const photos = await response.json();
   
-      // Uzupełnij `username` na podstawie mapy
       const updatedPhotos = photos.map((photo) => ({
         ...photo,
         username: userMap[photo.userId] || "Anonymous",
       }));
   
       setPhotos(updatedPhotos);
+      setPhotoLoadingStates(
+        updatedPhotos.reduce((states, photo) => {
+          states[photo._id] = true; // all photos are loading
+          return states;
+        }, {})
+      );
       calculateStatistics(updatedPhotos);
     } catch (error) {
       console.error("Error fetching photos:", error.message);
@@ -123,9 +129,16 @@ export default function GalleryPage() {
     }
   };
 
+  const handlePhotoLoad = (photoId) => {
+    setPhotoLoadingStates((prevState) => ({
+      ...prevState,
+      [photoId]: false, // photo loaded
+    }));
+  };
+
   const handleDeletePhoto = async (photoId) => {
     const url = `/api/photos/${photoId}`;
-    console.log("DELETE Request URL:", url); // Debug log
+    console.log("DELETE Request URL:", url);
   
     const response = await fetch(url, { method: "DELETE" });
   
@@ -182,7 +195,7 @@ export default function GalleryPage() {
           photo._id === updatedPhoto._id ? updatedPhoto : photo
         )
       );
-      setPhotoComments({ ...photoComments, [photoId]: "" }); // Clear the input for this photo
+      setPhotoComments({ ...photoComments, [photoId]: "" }); // Clear the input
     } else {
       console.error("Failed to add comment");
     }
@@ -228,7 +241,7 @@ export default function GalleryPage() {
         setPhotos((prevPhotos) =>
           prevPhotos.map((photo) =>
             photo._id === updatedPhoto._id
-              ? { ...photo, ...updatedPhoto } // Merge updatedPhoto to preserve username
+              ? { ...photo, ...updatedPhoto }
               : photo
           )
         );
@@ -253,7 +266,7 @@ export default function GalleryPage() {
         setPhotos((prevPhotos) =>
           prevPhotos.map((photo) =>
             photo._id === updatedPhoto._id
-              ? { ...photo, ...updatedPhoto } // Merge updatedPhoto to preserve username
+              ? { ...photo, ...updatedPhoto }
               : photo
           )
         );
@@ -276,7 +289,6 @@ export default function GalleryPage() {
   };
   
   // === sort photos ===
-  
   const sortPhotos = (photos) => {
     switch (sortOption) {
       case "likes":
@@ -340,10 +352,24 @@ export default function GalleryPage() {
         />
         <button type="submit">Add Photo</button>
       </form>
+
+      {isLoading ? (
+        <div className="gallery-loading">
+          <p>Loading gallery...</p>
+        </div>
+      ) : (
       <div className="gallery-container">
         {filteredAndSortedPhotos.map((photo) => (
           <div key={photo._id} className="gallery-item">
-            <img src={photo.imageUrl} alt={photo.title} />
+            {photoLoadingStates[photo._id] ? (
+              <div className="loading-indicator">Loading...</div>
+            ) : null}
+            <img
+              src={photo.imageUrl}
+              alt={photo.title}
+              onLoad={() => handlePhotoLoad(photo._id)}
+              style={{ display: photoLoadingStates[photo._id] ? "none" : "block" }}
+            />
             <p>{photo.title}</p>
             <div className="photo-likes">
             <p>{photo.likes?.length || 0} Likes</p>
@@ -402,6 +428,7 @@ export default function GalleryPage() {
           </div>
         ))}
       </div>
+      )}
 
       {isModalOpen && (
         <div className="modal">
