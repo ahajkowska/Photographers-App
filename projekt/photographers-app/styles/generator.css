@@ -1,49 +1,53 @@
 .idea-generator-page {
-  max-width: 600px;
-  margin: 50px auto;
+  max-width: 800px;
+  margin: 0 auto;
   padding: 20px;
-  background-color: var(--card-bg);
-  border: 1px solid var(--text-color);
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
 }
 
 .idea-generator-page h1 {
   text-align: center;
   margin-bottom: 20px;
-  color: var(--text-color);
+  font-size: 2rem;
+  color: #0070f3;
+}
+
+.idea-generator-page p {
+  margin-bottom: 20px;
 }
 
 .generator-section {
   margin-bottom: 20px;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .generator-section h2 {
+  color: #2c3e50;
   font-size: 1.5rem;
-  color: var(--text-color);
 }
 
 .generator-section button {
-  padding: 10px 15px;
-  background-color: var(--button-bg);
-  color: var(--button-text);
+  background-color: #3498db;
+  color: #fff;
   border: none;
-  border-radius: 4px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s;
 }
 
 .generator-section button:hover {
-  opacity: 0.9;
+  background-color: #2980b9;
 }
 
 .generator-section p {
+  font-size: 1.1rem;
+  color: #555;
   margin-top: 10px;
-  font-size: 1rem;
-  color: var(--text-color);
-}
-
-.generator-section div {
-  text-align: center;
-  border-radius: 4px;
 }

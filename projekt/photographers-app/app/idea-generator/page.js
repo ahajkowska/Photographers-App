@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   generateLocation,
   generatePerson,
   generateColor,
   generateTheme,
+  generateChallenge,
 } from "../../lib/ideaGenerators";
 
 export default function IdeaGeneratorPage() {
@@ -13,7 +14,38 @@ export default function IdeaGeneratorPage() {
   const [generatedPerson, setGeneratedPerson] = useState("");
   const [generatedColor, setGeneratedColor] = useState("");
   const [generatedTheme, setGeneratedTheme] = useState("");
+  const [generatedChallenge, setGeneratedChallenge] = useState("");
+  const [generatedSentence, setGeneratedSentence] = useState("");
 
+  const updateGeneratedSentence = () => {
+    const sentence = `During your next session, you will shoot ${generatedPerson || "a subject"} at ${
+      generatedLocation || "a location"
+    }, focusing on a ${generatedTheme || "theme"}. 
+    Make sure to incorporate the color ${generatedColor || "a color"} and take on the challenge: "${
+      generatedChallenge || "a challenge"
+    }."`;
+    setGeneratedSentence(sentence);
+  };
+
+  useEffect(() => {
+    updateGeneratedSentence();
+  }, [generatedLocation, generatedPerson, generatedColor, generatedTheme, generatedChallenge]);
+
+  const handleGenerateAll = () => {
+    const location = generateLocation();
+    const person = generatePerson();
+    const color = generateColor();
+    const theme = generateTheme();
+    const challenge = generateChallenge();
+  
+    // Zaktualizuj wszystkie stany
+    setGeneratedLocation(location);
+    setGeneratedPerson(person);
+    setGeneratedColor(color);
+    setGeneratedTheme(theme);
+    setGeneratedChallenge(challenge);
+  };
+  
   return (
     <div className="idea-generator-page">
       <h1>Idea Generator</h1>
@@ -54,6 +86,26 @@ export default function IdeaGeneratorPage() {
         </button>
         {generatedTheme && <p>Theme: {generatedTheme}</p>}
       </div>
+
+      <div className="generator-section">
+        <h2>Generate a Random Challenge</h2>
+        <button onClick={() => setGeneratedChallenge(generateChallenge())}>
+          Generate Challenge
+        </button>
+        {generatedChallenge && <p>Challenge: {generatedChallenge}</p>}
+      </div>
+
+      <div className="generator-section">
+        <h2>Generate Everything</h2>
+        <button onClick={handleGenerateAll}>Generate All</button>
+      </div>
+
+      {generatedSentence && (
+        <div className="generated-sentence">
+          <h3>Your Next Session:</h3>
+          <p>{generatedSentence}</p>
+        </div>
+      )}
     </div>
   );
 }
