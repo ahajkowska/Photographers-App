@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useReducer, useRef } from "react";
+import { useState, useEffect, useMemo, useReducer, useRef, useCallback } from "react";
 
 export default function GalleryPage() {
   // Define the initial state for the reducer
@@ -276,43 +276,53 @@ export default function GalleryPage() {
     }
   };
   
-  const handleLikePhoto = async (photoId) => {
+  const handleLikePhoto = useCallback(async (photoId) => {
     try {
       const response = await fetch(`/api/photos/${photoId}/like`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: loggedInUserId }),
       });
-  
+
       if (response.ok) {
         const updatedPhoto = await response.json();
-        dispatch({ type: "UPDATE_PHOTO", payload: updatedPhoto });
+        // Preserve the username in the updated photo
+        const photoWithUsername = {
+          ...updatedPhoto,
+          username: state.photos.find((photo) => photo._id === photoId).username,
+        };
+        dispatch({ type: "UPDATE_PHOTO", payload: photoWithUsername });
       } else {
         console.error("Failed to like photo");
       }
     } catch (error) {
       console.error("Error liking photo:", error);
     }
-  };
+  }, [loggedInUserId, state.photos]);
   
-  const handleUnlikePhoto = async (photoId) => {
+  const handleUnlikePhoto = useCallback(async (photoId) => {
     try {
       const response = await fetch(`/api/photos/${photoId}/like`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: loggedInUserId }),
       });
-  
+
       if (response.ok) {
         const updatedPhoto = await response.json();
-        dispatch({ type: "UPDATE_PHOTO", payload: updatedPhoto });
+        // Preserve the username in the updated photo
+        const photoWithUsername = {
+          ...updatedPhoto,
+          username: state.photos.find((photo) => photo._id === photoId).username,
+        };
+        dispatch({ type: "UPDATE_PHOTO", payload: photoWithUsername });
       } else {
         console.error("Failed to unlike photo");
       }
     } catch (error) {
       console.error("Error unliking photo:", error);
     }
-  };
+  }, [loggedInUserId, state.photos]);
   
   // == filter photos ==
   const filterPhotos = (photos) => {
@@ -411,13 +421,13 @@ export default function GalleryPage() {
             />
             <p>{photo.title}</p>
             <div className="photo-likes">
-            <p>{photo.likes?.length || 0} Likes</p>
-            {photo.likes?.includes(loggedInUserId) ? (
-              <button onClick={() => handleUnlikePhoto(photo._id)}>Unlike</button>
-            ) : (
-              <button onClick={() => handleLikePhoto(photo._id)}>Like</button>
-            )}
-          </div>
+              <p>{photo.likes?.length || 0} Likes</p>
+              {photo.likes?.includes(loggedInUserId) ? (
+                <button onClick={() => handleUnlikePhoto(photo._id)}>Unlike</button>
+              ) : (
+                <button onClick={() => handleLikePhoto(photo._id)}>Like</button>
+              )}
+            </div>
 
             <p>Tags: {photo.tags.join(", ")}</p>
             <p>
