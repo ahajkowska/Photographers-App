@@ -70,19 +70,82 @@
 
 /* Main Task Page */
 .task-page {
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 20px;
-  background: var(--card-bg);  ;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .task-page h1 {
   text-align: center;
-  margin-bottom: 20px;
-  font-size: 2rem;
-  color: #0070f3;
+  margin-bottom: 25px;
+  font-size: 2.2rem;
+  color: #0056b3;
+}
+
+/* Template Editor */
+.template-editor {
+  background: #f7f9fc;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  border: 1px solid #d1d9e6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.template-editor h3 {
+  color: #0056b3;
+  margin-bottom: 15px;
+}
+
+.template-editor input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: border-color 0.2s;
+}
+
+.template-editor input[type="text"]:focus {
+  border-color: #0056b3;
+}
+
+.template-editor button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.template-editor button:hover {
+  background-color: #218838;
+}
+
+/* Template Selection */
+.template-selector {
+  margin: 20px 0;
+  padding: 15px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.template-selector select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #0056b3;
+  border-radius: 5px;
+  background-color: #f7f9fc;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.template-selector select:focus {
+  border-color: #003d7a;
 }
 
 /* Task Editor */
@@ -90,22 +153,101 @@
 .equipment-item {
   display: flex;
   align-items: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
   margin-bottom: 10px;
-  gap: 10px;
 }
 
 .task-item input[type="text"],
 .equipment-item input[type="text"] {
   flex: 1;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 8px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: border-color 0.2s;
 }
 
-.task-item input[type="checkbox"],
-.equipment-item input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
+.task-item button,
+.equipment-item button {
+  padding: 8px 12px;
+  background-color: #ff4d4d;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.task-item button:hover,
+.equipment-item button:hover {
+  background-color: #cc0000;
+}
+
+/* Task Viewer */
+.task-viewer {
+  margin-top: 35px;
+  padding-top: 25px;
+  border-top: 2px solid #d1d9e6;
+}
+
+.task-viewer > div {
+  background: #ffffff;
+  padding: 18px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.task-viewer h3 {
+  color: #0056b3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task-viewer button {
+  padding: 8px 16px;
+  margin-right: 8px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+.task-viewer button:first-of-type {
+  background-color: #28a745;
+  color: white;
+}
+
+.task-viewer button:last-of-type {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Action Buttons */
+.equipment-buttons button {
+  width: 100%;
+  padding: 10px;
+  background-color: #0056b3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.equipment-buttons button:hover {
+  background-color: #003d7a;
+}
+
+/* Checkbox Styling */
+input[type="checkbox"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: #0056b3;
 }
 
 /* Task List Viewer */
@@ -121,7 +263,6 @@
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  background-color: #fefefe;
   margin-bottom: 10px;
 }
 
@@ -146,5 +287,189 @@ h4 {
   color: #666;
   font-style: italic;
   margin: 20px 0;
+}
+
+/* Task Page Container */
+.task-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+/* Task List Header */
+.task-page .task-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.task-page .task-list-header h2 {
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.task-page .task-list-header button {
+  padding: 10px 20px;
+  background-color: #0070f3;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.task-page .task-list-header button:hover {
+  background-color: #005bb5;
+}
+
+/* Task Item */
+.task-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  margin-bottom: 10px;
+}
+
+.task-item span {
+  flex: 1;
+  font-size: 1rem;
+  color: #333;
+}
+
+.task-item button {
+  padding: 5px 10px;
+  background-color: #ff4d4d;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.task-item button:hover {
+  background-color: #cc0000;
+}
+
+/* Equipment Item */
+.equipment-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  margin-bottom: 10px;
+}
+
+.equipment-item span {
+  flex: 1;
+  font-size: 1rem;
+  color: #333;
+}
+
+.equipment-item button {
+  padding: 5px 10px;
+  background-color: #ff4d4d;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.equipment-item button:hover {
+  background-color: #cc0000;
+}
+
+/* Template Section */
+.template-section {
+  margin-top: 40px;
+}
+
+.template-section h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.template-section .template-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  margin-bottom: 10px;
+}
+
+.template-section .template-item span {
+  flex: 1;
+  font-size: 1rem;
+  color: #333;
+}
+
+.template-section .template-item button {
+  padding: 5px 10px;
+  background-color: #0070f3;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.template-section .template-item button:hover {
+  background-color: #005bb5;
+}
+
+/* New Template Form */
+.new-template-form {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+.new-template-form input,
+.new-template-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.new-template-form button {
+  padding: 10px 20px;
+  background-color: #0070f3;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.new-template-form button:hover {
+  background-color: #005bb5;
+}
+
+/* Toggle Button for Template Editor */
+.template-toggle-button {
+  display: inline-block;
+  margin: 20px 0;
+  padding: 10px 20px;
+  background-color: #00244d91;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.template-toggle-button:hover {
+  background-color: #00244dc9;
 }
 

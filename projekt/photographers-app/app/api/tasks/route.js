@@ -23,7 +23,7 @@ export async function POST(req) {
   }
 }
 
-// fetch all task lists
+// fetch all task lists (for specific user)
 export async function GET(req) {
   await dbConnect();
 

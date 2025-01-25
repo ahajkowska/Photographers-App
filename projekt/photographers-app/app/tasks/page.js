@@ -15,6 +15,7 @@ export default function TaskPage() {
   const [newTemplateName, setNewTemplateName] = useState("");
   const [newTemplateTasks, setNewTemplateTasks] = useState([]);
   const [newTemplateEquipment, setNewTemplateEquipment] = useState([]);
+  const [isTemplateEditorVisible, setIsTemplateEditorVisible] = useState(false);
 
   const fetchTemplates = async () => {
     const userId = localStorage.getItem("userId");
@@ -77,6 +78,11 @@ export default function TaskPage() {
 
     if (!userId) {
       console.error("User ID not found in localStorage");
+      return;
+    }
+
+    if (!newTemplateName.trim()) {
+      alert("Please enter a title!");
       return;
     }
 
@@ -144,7 +150,12 @@ export default function TaskPage() {
       console.error("User ID not found in localStorage");
       return;
     }
-    
+
+    if (!title.trim()) {
+      alert("Please enter a title!");
+      return;
+    }
+
     if (editingListId) {
       // update existing task list
       const response = await fetch(`/api/tasks/${editingListId}`, {
@@ -211,49 +222,65 @@ export default function TaskPage() {
     <div className="task-page">
       <h1>Task Manager</h1>
 
+      {/* Toggle Template Editor Visibility */}
+      <button className="template-toggle-button" onClick={() => setIsTemplateEditorVisible(!isTemplateEditorVisible)}>
+        {isTemplateEditorVisible ? "Hide Template Editor" : "Show Template Editor"}
+      </button>
+
       {/* Create New Template */}
-      <div className="template-editor">
-        <h3>Create New Template</h3>
-        <input
-          type="text"
-          placeholder="Template Name"
-          value={newTemplateName}
-          onChange={(e) => setNewTemplateName(e.target.value)}
-        />
-        <h4>Tasks</h4>
-        {newTemplateTasks.map((task, idx) => (
-          <div key={idx}>
-            <input
-              type="text"
-              value={task.text}
-              onChange={(e) => {
-                const updatedTasks = [...newTemplateTasks];
-                updatedTasks[idx].text = e.target.value;
+      {isTemplateEditorVisible && (
+        <div className="template-editor">
+          <h3>Create New Template</h3>
+          <input
+            type="text"
+            placeholder="Template Title"
+            value={newTemplateName}
+            onChange={(e) => setNewTemplateName(e.target.value)}
+          />
+          <h4>Tasks</h4>
+          {newTemplateTasks.map((task, idx) => (
+            <div key={idx} className="task-item">
+              <input
+                type="text"
+                value={task.text}
+                onChange={(e) => {
+                  const updatedTasks = [...newTemplateTasks];
+                  updatedTasks[idx].text = e.target.value;
+                  setNewTemplateTasks(updatedTasks);
+                }}
+              />
+              <button onClick={() => {
+                const updatedTasks = newTemplateTasks.filter((_, i) => i !== idx);
                 setNewTemplateTasks(updatedTasks);
-              }}
-            />
-          </div>
-        ))}
-        <button onClick={() => setNewTemplateTasks([...newTemplateTasks, { text: "" }])}>Add Task</button>
+              }}>Delete Task</button>
+            </div>
+          ))}
+          <button onClick={() => setNewTemplateTasks([...newTemplateTasks, { text: "" }])}>Add Task</button>
 
-        <h4>Equipment</h4>
-        {newTemplateEquipment.map((item, idx) => (
-          <div key={idx}>
-            <input
-              type="text"
-              value={item}
-              onChange={(e) => {
-                const updatedEquipment = [...newTemplateEquipment];
-                updatedEquipment[idx] = e.target.value;
+          <h4>Equipment</h4>
+          {newTemplateEquipment.map((item, idx) => (
+            <div key={idx} className="equipment-item">
+              <input
+                type="text"
+                value={item}
+                onChange={(e) => {
+                  const updatedEquipment = [...newTemplateEquipment];
+                  updatedEquipment[idx] = e.target.value;
+                  setNewTemplateEquipment(updatedEquipment);
+                }}
+              />
+              <button onClick={() => {
+                const updatedEquipment = newTemplateEquipment.filter((_, i) => i !== idx);
                 setNewTemplateEquipment(updatedEquipment);
-              }}
-            />
+              }}>Delete Equipment</button>
+            </div>
+          ))}
+          <div className="equipment-buttons">
+            <button onClick={() => setNewTemplateEquipment([...newTemplateEquipment, ""])}>Add Equipment</button>
+            <button onClick={saveTemplate}>Save Template</button>
           </div>
-        ))}
-        <button onClick={() => setNewTemplateEquipment([...newTemplateEquipment, ""])}>Add Equipment</button>
-
-        <button onClick={saveTemplate}>Save Template</button>
-      </div>
+        </div>
+      )}
 
       {/* Templates */}
       <div>
