@@ -1,10 +1,64 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useReducer, useRef } from "react";
 
 export default function GalleryPage() {
-  const [photos, setPhotos] = useState([]);
-  const [photoLoadingStates, setPhotoLoadingStates] = useState({});
+  // Define the initial state for the reducer
+  const initialState = {
+    photos: [],
+    photoLoadingStates: {},
+  };
+
+  // Define the reducer function
+  const galleryReducer = (state, action) => {
+    switch (action.type) {
+      case "SET_PHOTOS":
+        return {
+          ...state,
+          photos: action.payload,
+          photoLoadingStates: {
+            ...state.photoLoadingStates,
+            ...action.payload.reduce((states, photo) => {
+              if (!(photo._id in states)) {
+                states[photo._id] = false; // Ensure existing states are preserved
+              }
+              return states;
+            }, {}),
+          },
+        };
+      case "UPDATE_PHOTO":
+        return {
+          ...state,
+          photos: state.photos.map((photo) =>
+            photo._id === action.payload._id ? action.payload : photo
+          ),
+        };
+      case "PHOTO_LOADED":
+        return {
+          ...state,
+          photoLoadingStates: {
+            ...state.photoLoadingStates,
+            [action.payload]: false, // photo has finished loading
+          },
+        };
+      case "ADD_PHOTO":
+        return {
+          ...state,
+          photos: [...state.photos, action.payload],
+        };
+      case "DELETE_PHOTO":
+        return {
+          ...state,
+          photos: state.photos.filter((photo) => photo._id !== action.payload),
+        };
+      default:
+        return state;
+    }
+  };
+
+  // Use the useReducer hook
+  const [state, dispatch] = useReducer(galleryReducer, initialState);
+
   const [newPhoto, setNewPhoto] = useState({ title: "", image: "", tags: [] });
   const [photoComments, setPhotoComments] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -66,13 +120,7 @@ export default function GalleryPage() {
         username: userMap[photo.userId] || "Anonymous",
       }));
   
-      setPhotos(updatedPhotos);
-      setPhotoLoadingStates(
-        updatedPhotos.reduce((states, photo) => {
-          states[photo._id] = true; // all photos are loading
-          return states;
-        }, {})
-      );
+      dispatch({ type: "SET_PHOTOS", payload: updatedPhotos });
       calculateStatistics(updatedPhotos);
     } catch (error) {
       console.error("Error fetching photos:", error.message);
@@ -121,19 +169,16 @@ export default function GalleryPage() {
     if (response.ok) {
       const savedPhoto = await response.json();
       const updatedPhoto = { ...savedPhoto, username: loggedInUsername };
-      setPhotos([...photos, savedPhoto]);
+      dispatch({ type: "ADD_PHOTO", payload: updatedPhoto });
       setNewPhoto({ title: "", image: "", tags: [] }); // Reset form
-      calculateStatistics([...photos, updatedPhoto]); // Update statistics    
+      calculateStatistics([...state.photos, updatedPhoto]); // Update statistics    
     } else {
       console.error("Failed to add photo");
     }
   };
 
   const handlePhotoLoad = (photoId) => {
-    setPhotoLoadingStates((prevState) => ({
-      ...prevState,
-      [photoId]: false, // photo loaded
-    }));
+    dispatch({ type: "PHOTO_LOADED", payload: photoId });
   };
 
   const handleDeletePhoto = async (photoId) => {
@@ -144,7 +189,7 @@ export default function GalleryPage() {
   
     if (response.ok) {
       console.log("Photo deleted successfully");
-      setPhotos(photos.filter((photo) => photo._id !== photoId));
+      dispatch({ type: "DELETE_PHOTO", payload: photoId });
     } else {
       const errorText = await response.text();
       console.error("Failed to delete photo:", errorText);
@@ -165,42 +210,44 @@ export default function GalleryPage() {
       body: JSON.stringify({ title: currentPhoto.title, tags: currentPhoto.tags }),
     });
     const updatedPhoto = await response.json();
-    setPhotos(photos.map((photo) => (photo._id === updatedPhoto._id ? updatedPhoto : photo)));
+    dispatch({ type: "UPDATE_PHOTO", payload: updatedPhoto });
     setIsModalOpen(false);
     setCurrentPhoto(null);
   };
 
   // == comments ==
-  const handleAddComment = async (photoId) => {
-    const commentText = photoComments[photoId];
-    if (!commentText?.trim()) {
-      alert("Comment cannot be empty");
-      return;
-    }
-  
-    const response = await fetch(`/api/photos/${photoId}/comments`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: loggedInUserId,
-        username: loggedInUsername,
-        text: commentText,
-      }),
-    });
-  
-    if (response.ok) {
-      const updatedPhoto = await response.json();
-      setPhotos(
-        photos.map((photo) =>
-          photo._id === updatedPhoto._id ? updatedPhoto : photo
-        )
-      );
-      setPhotoComments({ ...photoComments, [photoId]: "" }); // Clear the input
-    } else {
-      console.error("Failed to add comment");
-    }
-  };  
+  const handleAddComment = async (photoId, commentText) => {
+    try {
+      const response = await fetch(`/api/photos/${photoId}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: loggedInUserId,
+          username: loggedInUsername,
+          text: commentText,
+        }),
+      });
 
+      if (response.ok) {
+        const updatedPhoto = await response.json();
+        // Preserve the username in the updated photo
+        const photoWithUsername = {
+          ...updatedPhoto,
+          username: state.photos.find((photo) => photo._id === photoId).username,
+        };
+        dispatch({ type: "UPDATE_PHOTO", payload: photoWithUsername });
+        setPhotoComments((prevComments) => ({
+          ...prevComments,
+          [photoId]: "", // Clear the input after adding a comment
+        }));
+      } else {
+        console.error("Failed to add comment");
+      }
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
+  };
+  
   const handleDeleteComment = async (photoId, commentId) => {
     try {
       const response = await fetch(`/api/photos/${photoId}/comments`, {
@@ -209,17 +256,18 @@ export default function GalleryPage() {
         body: JSON.stringify({
           photoId,
           commentId,
-          userId: localStorage.getItem("userId"),
+          userId: loggedInUserId,
         }),
       });
   
       if (response.ok) {
         const updatedPhoto = await response.json();
-        setPhotos(
-          photos.map((photo) =>
-            photo._id === updatedPhoto._id ? updatedPhoto : photo
-          )
-        );
+        // Preserve the username in the updated photo
+        const photoWithUsername = {
+          ...updatedPhoto,
+          username: state.photos.find((photo) => photo._id === photoId).username,
+        };
+        dispatch({ type: "UPDATE_PHOTO", payload: photoWithUsername });
       } else {
         console.error("Failed to delete comment");
       }
@@ -238,13 +286,7 @@ export default function GalleryPage() {
   
       if (response.ok) {
         const updatedPhoto = await response.json();
-        setPhotos((prevPhotos) =>
-          prevPhotos.map((photo) =>
-            photo._id === updatedPhoto._id
-              ? { ...photo, ...updatedPhoto }
-              : photo
-          )
-        );
+        dispatch({ type: "UPDATE_PHOTO", payload: updatedPhoto });
       } else {
         console.error("Failed to like photo");
       }
@@ -263,13 +305,7 @@ export default function GalleryPage() {
   
       if (response.ok) {
         const updatedPhoto = await response.json();
-        setPhotos((prevPhotos) =>
-          prevPhotos.map((photo) =>
-            photo._id === updatedPhoto._id
-              ? { ...photo, ...updatedPhoto }
-              : photo
-          )
-        );
+        dispatch({ type: "UPDATE_PHOTO", payload: updatedPhoto });
       } else {
         console.error("Failed to unlike photo");
       }
@@ -302,8 +338,11 @@ export default function GalleryPage() {
     }
   };
 
-  const filteredAndSortedPhotos = sortPhotos(filterPhotos(photos));
-  
+  const filteredAndSortedPhotos = useMemo(() => {
+    const filtered = filterPhotos(state.photos);
+    return sortPhotos(filtered);
+  }, [state.photos, searchTag, sortOption]);
+
   return (
     <div className="gallery-page">
       <h1>Gallery</h1>
@@ -361,14 +400,14 @@ export default function GalleryPage() {
       <div className="gallery-container">
         {filteredAndSortedPhotos.map((photo) => (
           <div key={photo._id} className="gallery-item">
-            {photoLoadingStates[photo._id] ? (
+            {state.photoLoadingStates[photo._id] ? (
               <div className="loading-indicator">Loading...</div>
             ) : null}
             <img
               src={photo.imageUrl}
               alt={photo.title}
               onLoad={() => handlePhotoLoad(photo._id)}
-              style={{ display: photoLoadingStates[photo._id] ? "none" : "block" }}
+              style={{ display: state.photoLoadingStates[photo._id] ? "none" : "block" }}
             />
             <p>{photo.title}</p>
             <div className="photo-likes">
@@ -415,8 +454,15 @@ export default function GalleryPage() {
                     [photo._id]: e.target.value,
                   })
                 }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleAddComment(photo._id, photoComments[photo._id]);
+                  }
+                }}
               />
-              <button onClick={() => handleAddComment(photo._id)}>Post</button>
+              <button onClick={() => handleAddComment(photo._id, photoComments[photo._id])}>
+                Post
+              </button>
             </div>
 
             {photo.userId === loggedInUserId && (

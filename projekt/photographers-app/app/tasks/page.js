@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { defaultTemplates } from "../../lib/templates";
 
 export default function TaskPage() {
@@ -16,6 +16,14 @@ export default function TaskPage() {
   const [newTemplateTasks, setNewTemplateTasks] = useState([]);
   const [newTemplateEquipment, setNewTemplateEquipment] = useState([]);
   const [isTemplateEditorVisible, setIsTemplateEditorVisible] = useState(false);
+
+  const titleInputRef = useRef(null);
+
+  useLayoutEffect(() => {
+    if (titleInputRef.current) {
+      titleInputRef.current.focus();
+    }
+  }, [editingListId]); // Runs whenever `editingListId` changes
 
   const fetchTemplates = async () => {
     const userId = localStorage.getItem("userId");
@@ -298,6 +306,7 @@ export default function TaskPage() {
       <div>
       <h2>{editingListId ? "Edit Task List" : "New Task List"}</h2>
         <input
+          ref={titleInputRef}
           type="text"
           placeholder="Enter task list title"
           value={title}

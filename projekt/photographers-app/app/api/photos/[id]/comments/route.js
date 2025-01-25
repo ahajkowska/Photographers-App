@@ -1,11 +1,12 @@
 import dbConnect from "../../../../../lib/mongodb";
 import Photo from "../../../../../models/Photo";
 
-export async function POST(req, { params }) {
+export async function POST(req, context) {
   await dbConnect();
 
   try {
-    const { id } = params;
+    const { params } = context;
+    const { id } = await params;
     const { userId, username, text } = await req.json();
 
     if (!id || !userId || !text || !username) {
@@ -32,18 +33,19 @@ export async function POST(req, { params }) {
   }
 }
 
-export async function DELETE(req, { params }) {
+export async function DELETE(req, context) {
   await dbConnect();
 
   try {
+    const { params } = context;
     const { photoId, commentId, userId } = await req.json();
 
-    // Znajdź zdjęcie i usuń komentarz
+    // Find the photo and remove the comment
     const updatedPhoto = await Photo.findByIdAndUpdate(
       photoId,
       {
         $pull: {
-          comments: { _id: commentId, userId }, // Usuń tylko jeśli komentarz należy do użytkownika
+          comments: { _id: commentId, userId }, // Remove only if the comment belongs to the user
         },
       },
       { new: true }
