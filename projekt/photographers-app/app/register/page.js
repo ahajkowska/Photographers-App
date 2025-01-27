@@ -4,11 +4,7 @@ import { useState } from "react";
 import Link from 'next/link';
 
 export default function RegisterPage() {
-    const [formData, setFormData] = useState({
-        username: "",
-        email: "",
-        password: "",
-    });
+    const [formData, setFormData] = useState({ username: "", email: "", password: "" });
     const [message, setMessage] = useState("");
 
     const handleInputChange = (e) => {

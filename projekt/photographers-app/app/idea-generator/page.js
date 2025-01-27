@@ -1,13 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  generateLocation,
-  generatePerson,
-  generateColor,
-  generateTheme,
-  generateChallenge,
-} from "../../lib/ideaGenerators";
+import { generateLocation, generatePerson, generateColor,generateTheme, generateChallenge } from "../../lib/ideaGenerators";
 
 export default function IdeaGeneratorPage() {
   const [generatedLocation, setGeneratedLocation] = useState("");

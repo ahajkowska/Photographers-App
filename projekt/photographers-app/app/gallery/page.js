@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import useGallery from "../../hooks/useGallery";
 import Statistics from "../../components/Statistics";
 import { fetchUsers, fetchPhotos } from "../../handlers/galleryService";

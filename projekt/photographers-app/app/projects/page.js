@@ -13,7 +13,6 @@ export default function ProjectsPage() {
   const [currentProject, setCurrentProject] = useState(null);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
 
-  // Upewnij się, że `localStorage` jest odczytany po stronie klienta
   useEffect(() => {
     const userId = localStorage.getItem("userId");
     setLoggedInUserId(userId);
@@ -39,7 +38,6 @@ export default function ProjectsPage() {
     }
   };
 
-  // Walidacja danych w formularzu
   const validationSchema = Yup.object().shape({
     title: Yup.string()
       .required("Project title is required")
@@ -113,7 +111,6 @@ export default function ProjectsPage() {
     <div className="projects-page">
       <h1>Projects</h1>
 
-      {/* Formik Form */}
       <Formik
         initialValues={
           currentProject || {
@@ -256,7 +253,6 @@ export default function ProjectsPage() {
               </FieldArray>
             </div>
 
-            {/* Submit Button */}
             <button type="submit" className="form-submit">
               {isEditing ? "Update Project" : "Add Project"}
             </button>
@@ -272,11 +268,9 @@ export default function ProjectsPage() {
             <p><strong>Equipment:</strong> {project.equipment.join(", ") || "None"}</p>
             <p><strong>Idea:</strong> {project.idea || "No idea yet"}</p>
 
-            {/* Render the Timeline */}
             <p><strong>Timeline:</strong></p>
             <Timeline deadlines={project.deadlines} />
 
-            {/* Image Cards */}
             <p><strong>Images:</strong></p>
             <div className="image-cards">
               {project.images.map((image, i) => (

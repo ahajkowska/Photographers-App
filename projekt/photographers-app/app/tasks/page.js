@@ -5,8 +5,8 @@ import { defaultTemplates } from "../../lib/templates";
 
 export default function TaskPage() {
   const [taskLists, setTaskLists] = useState([]);
-  const [templates, setTemplates] = useState([]); // User-defined templates
-  const [selectedTemplate, setSelectedTemplate] = useState("Portrait Session");
+  const [templates, setTemplates] = useState([]); // custom templates
+  const [selectedTemplate, setSelectedTemplate] = useState("");
   const [title, setTitle] = useState("");
   const [tasks, setTasks] = useState([]);
   const [equipment, setEquipment] = useState([]);
@@ -23,7 +23,7 @@ export default function TaskPage() {
     if (titleInputRef.current) {
       titleInputRef.current.focus();
     }
-  }, [editingListId]); // Runs whenever `editingListId` changes
+  }, [editingListId]);
 
   const fetchTemplates = async () => {
     const userId = localStorage.getItem("userId");
@@ -37,7 +37,7 @@ export default function TaskPage() {
       const response = await fetch(`/api/templates?userId=${userId}`);
       const customTemplates = await response.json();
 
-      // Combine default and custom templates
+      // default and custom templates
       const combinedTemplates = [
         ...Object.keys(defaultTemplates).map((key) => ({
           name: key,
@@ -80,7 +80,6 @@ export default function TaskPage() {
     setEquipment(selectedTemplate.equipment.map((item) => ({ ...item, isCompleted: false })));
   };
 
-  // Save a custom template
   const saveTemplate = async () => {
     const userId = localStorage.getItem("userId");
 
@@ -179,7 +178,7 @@ export default function TaskPage() {
             list._id === editingListId ? updatedList : list
           )
         );
-        setEditingListId(null); // reset editing state
+        setEditingListId(null);
       }
     } else {
       // create new task list
@@ -230,7 +229,7 @@ export default function TaskPage() {
     <div className="task-page">
       <h1>Task Manager</h1>
 
-      {/* Toggle Template Editor Visibility */}
+      {/* Template Editor Visibility */}
       <button className="template-toggle-button" onClick={() => setIsTemplateEditorVisible(!isTemplateEditorVisible)}>
         {isTemplateEditorVisible ? "Hide Template Editor" : "Show Template Editor"}
       </button>
@@ -361,7 +360,7 @@ export default function TaskPage() {
         </div>
       </div>
 
-      {/* Task List Viewer */}
+      {/* Task List */}
       <div className="task-viewer">
         <h2>Saved Task Lists</h2>
         {taskLists.map((list) => (

@@ -13,7 +13,7 @@ export const galleryReducer = (state, action) => {
                 ...state.photoLoadingStates,
                 ...action.payload.reduce((states, photo) => {
                 if (!(photo._id in states)) {
-                    states[photo._id] = false; // Ensure existing states are preserved
+                    states[photo._id] = false;
                 }
                 return states;
                 }, {}),

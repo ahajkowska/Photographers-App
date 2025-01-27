@@ -1,6 +1,4 @@
-/* Navbar styles */
 nav {
-  /* background-color: #0070f3; */
   color: white;
   padding: 10px 20px;
   display: flex;
@@ -56,10 +54,9 @@ nav ul li a {
   color: #0070f3;
 }
 
-/* Footer styles */
-.footer {
+footer {
   background-color: #333;
-  color: white;
+  color: #fff;
   text-align: center;
   padding: 20px 0;
 }
@@ -88,7 +85,6 @@ nav ul li a {
   transform: scale(1.2);
 }
 
-/* Projects Page Styles */
 .project-list {
   display: flex;
   flex-direction: column;

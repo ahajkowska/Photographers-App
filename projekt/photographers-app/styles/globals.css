@@ -18,6 +18,9 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
   transition: background-color 0.3s ease, color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* Theme Classes */
@@ -46,6 +49,7 @@ ul {
 /* Main Content */
 main {
   padding: 20px;
+  flex: 1;
 }
 
 /* Project Card */
@@ -112,4 +116,8 @@ button:hover {
   text-align: center;
   color: #999;
   font-size: 1rem;
+}
+
+.theme-toggle-button {
+  max-width: fit-content;
 }
