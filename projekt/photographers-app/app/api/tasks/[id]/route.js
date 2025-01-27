@@ -6,10 +6,9 @@ export async function PUT(req, { params }) {
   await dbConnect();
 
   try {
-    const { id } = params; // Extract the task list ID from the URL
+    const { id } = params; // task list ID
     const { title, tasks, equipment } = await req.json();
 
-    // Validate input
     if (!id || (!title && !tasks && !equipment)) {
       return new Response(
         JSON.stringify({ error: "Invalid input. ID and at least one field to update are required." }),
@@ -17,11 +16,10 @@ export async function PUT(req, { params }) {
       );
     }
 
-    // Update the task list
     const updatedTaskList = await Task.findByIdAndUpdate(
       id,
       { ...(title && { title }), ...(tasks && { tasks }), ...(equipment && { equipment }) },
-      { new: true } // Return the updated document
+      { new: true }
     );
 
     if (!updatedTaskList) {
@@ -43,13 +41,12 @@ export async function DELETE(req, { params }) {
   await dbConnect();
 
   try {
-    const { id } = params; // Extract the task list ID from the URL
+    const { id } = params;
 
     if (!id) {
       return new Response(JSON.stringify({ error: "Task list ID is required" }), { status: 400 });
     }
 
-    // Delete the task list
     const deletedTaskList = await Task.findByIdAndDelete(id);
 
     if (!deletedTaskList) {

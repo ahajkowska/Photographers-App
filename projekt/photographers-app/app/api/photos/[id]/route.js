@@ -65,7 +65,6 @@ export async function PUT(req, { params }) {
         return new Response(JSON.stringify({ error: "Invalid input" }), { status: 400 });
       }
   
-      // Find and update the photo
       const updatedPhoto = await Photo.findByIdAndUpdate(
         id,
         { ...(title && { title }), ...(tags && { tags }) },

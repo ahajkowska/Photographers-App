@@ -1,12 +1,11 @@
 import dbConnect from "../../../../../lib/mongodb";
 import Photo from "../../../../../models/Photo";
 
-export async function POST(req, context) {
+export async function POST(req, { params }) {
   await dbConnect();
 
   try {
-    const { params } = context;
-    const { id } = await params;
+    const { id } = params;
     const { userId, username, text } = await req.json();
 
     if (!id || !userId || !text || !username) {
@@ -33,14 +32,13 @@ export async function POST(req, context) {
   }
 }
 
-export async function DELETE(req, context) {
+export async function DELETE(req, { params }) {
   await dbConnect();
 
   try {
-    const { params } = context;
     const { photoId, commentId, userId } = await req.json();
 
-    // Find the photo and remove the comment
+    // Find photo and remove comment
     const updatedPhoto = await Photo.findByIdAndUpdate(
       photoId,
       {

@@ -6,12 +6,10 @@ export async function POST(req) {
   try {
     const { userId, ...projectData } = await req.json();
 
-    // Sprawdź, czy userId jest podane
     if (!userId) {
       return new Response("Unauthorized: userId is required", { status: 401 });
     }
 
-    // Tworzenie projektu przypisanego do userId
     const newProject = await Project.create({ ...projectData, userId });
     return new Response(JSON.stringify(newProject), { status: 201 });
   } catch (error) {
@@ -25,12 +23,10 @@ export async function GET(req) {
   try {
     const userId = req.headers.get("userid");
 
-    // Sprawdź, czy userId jest podane
     if (!userId) {
       return new Response("Unauthorized: userId is required", { status: 401 });
     }
 
-    // Pobierz tylko projekty przypisane do zalogowanego użytkownika
     const projects = await Project.find({ userId });
     return new Response(JSON.stringify(projects), { status: 200 });
   } catch (error) {
@@ -44,12 +40,10 @@ export async function PUT(req) {
   try {
     const { id, userId, ...updateData } = await req.json();
 
-    // Sprawdź, czy userId jest podane
     if (!userId) {
       return new Response("Unauthorized: userId is required", { status: 401 });
     }
 
-    // Aktualizuj tylko projekt przypisany do userId
     const updatedProject = await Project.findOneAndUpdate(
       { _id: id, userId },
       updateData,
@@ -72,12 +66,10 @@ export async function DELETE(req) {
   try {
     const { id, userId } = await req.json();
 
-    // Sprawdź, czy userId jest podane
     if (!userId) {
       return new Response("Unauthorized: userId is required", { status: 401 });
     }
 
-    // Usuń tylko projekt przypisany do userId
     const deletedProject = await Project.findOneAndDelete({ _id: id, userId });
 
     if (!deletedProject) {

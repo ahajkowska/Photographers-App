@@ -16,7 +16,7 @@ export async function POST(req, { params }) {
       id,
       { $addToSet: { likes: userId } },
       { new: true }
-    ).populate("userId", "username"); // Populate userId with username
+    ).populate("userId", "username");
 
     if (!updatedPhoto) {
       return new Response("Photo not found", { status: 404 });
@@ -44,7 +44,7 @@ export async function DELETE(req, { params }) {
       id,
       { $pull: { likes: userId } },
       { new: true }
-    ).populate("userId", "username"); // Populate userId with username
+    ).populate("userId", "username");
 
     if (!updatedPhoto) {
       return new Response("Photo not found", { status: 404 });

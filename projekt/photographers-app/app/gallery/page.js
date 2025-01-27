@@ -1,66 +1,17 @@
 "use client";
 
-import { useState, useEffect, useMemo, useReducer, useRef, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import useGallery from "../../hooks/useGallery";
+import Statistics from "../../components/Statistics";
+import { fetchUsers, fetchPhotos } from "../../handlers/galleryService";
+import { handleAddPhoto, handleDeletePhoto, handleEditPhoto, handleUpdatePhoto, handleLikePhoto, handleUnlikePhoto } from "../../handlers/galleryHandlers";
+import Comments from "../../components/Comments";
+import SortOptions from "../../components/SortOptions";
 
 export default function GalleryPage() {
-  // Define the initial state for the reducer
-  const initialState = {
-    photos: [],
-    photoLoadingStates: {},
-  };
-
-  // Define the reducer function
-  const galleryReducer = (state, action) => {
-    switch (action.type) {
-      case "SET_PHOTOS":
-        return {
-          ...state,
-          photos: action.payload,
-          photoLoadingStates: {
-            ...state.photoLoadingStates,
-            ...action.payload.reduce((states, photo) => {
-              if (!(photo._id in states)) {
-                states[photo._id] = false; // Ensure existing states are preserved
-              }
-              return states;
-            }, {}),
-          },
-        };
-      case "UPDATE_PHOTO":
-        return {
-          ...state,
-          photos: state.photos.map((photo) =>
-            photo._id === action.payload._id ? action.payload : photo
-          ),
-        };
-      case "PHOTO_LOADED":
-        return {
-          ...state,
-          photoLoadingStates: {
-            ...state.photoLoadingStates,
-            [action.payload]: false, // photo has finished loading
-          },
-        };
-      case "ADD_PHOTO":
-        return {
-          ...state,
-          photos: [...state.photos, action.payload],
-        };
-      case "DELETE_PHOTO":
-        return {
-          ...state,
-          photos: state.photos.filter((photo) => photo._id !== action.payload),
-        };
-      default:
-        return state;
-    }
-  };
-
-  // Use the useReducer hook
-  const [state, dispatch] = useReducer(galleryReducer, initialState);
+  const { state, dispatch } = useGallery();
 
   const [newPhoto, setNewPhoto] = useState({ title: "", image: "", tags: [] });
-  const [photoComments, setPhotoComments] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPhoto, setCurrentPhoto] = useState(null);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
@@ -79,58 +30,20 @@ export default function GalleryPage() {
   
       const userMap = await fetchUsers();
   
-      await fetchPhotos(userMap);
+      await fetchPhotos(userMap, dispatch, calculateStatistics);
       setIsLoading(false); 
     };
   
     initialize();
-  }, []);
-  
-
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch("/api/users", {
-        method: "GET",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch users");
-      }
-  
-      const users = await response.json();
-      return users.reduce((map, user) => {
-        map[user._id] = user.username;
-        return map;
-      }, {});
-    } catch (error) {
-      console.error("Error fetching users:", error.message);
-      return {};
-    }
-  };
-
-  const fetchPhotos = async (userMap) => {
-    try {
-      const response = await fetch("/api/photos");
-      if (!response.ok) {
-        throw new Error("Failed to fetch photos");
-      }
-      const photos = await response.json();
-  
-      const updatedPhotos = photos.map((photo) => ({
-        ...photo,
-        username: userMap[photo.userId] || "Anonymous",
-      }));
-  
-      dispatch({ type: "SET_PHOTOS", payload: updatedPhotos });
-      calculateStatistics(updatedPhotos);
-    } catch (error) {
-      console.error("Error fetching photos:", error.message);
-    }
-  };  
+  }, []); 
 
   const calculateStatistics = (photos) => {
-    const totalPhotos = photos.length;
+    if (!photos || !Array.isArray(photos)) {
+      return { totalPhotos: 0, totalComments: 0, topUser: null };
+    }
   
-    const totalComments = photos.reduce((sum, photo) => sum + photo.comments.length, 0);
+    const totalPhotos = photos.length;
+    const totalComments = photos.reduce((sum, photo) => sum + (photo.comments ? photo.comments.length : 0), 0);
   
     const userPhotoCounts = photos.reduce((acc, photo) => {
       const username = photo.username || "Anonymous";
@@ -143,76 +56,11 @@ export default function GalleryPage() {
       { username: null, count: 0 }
     );
   
-    setStatistics({ totalPhotos, totalComments, topUser });
-  };
-
-  // Add new photo
-  const handleAddPhoto = async (e) => {
-    e.preventDefault();
-
-    if (!newPhoto.title || !newPhoto.image) {
-      alert("Please provide a title and image URL.");
-      return;
-    }
-
-    const response = await fetch("/api/photos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: newPhoto.title,
-        imageUrl: newPhoto.image,
-        userId: loggedInUserId,
-        username: loggedInUsername,
-        tags: newPhoto.tags,
-      }),
-    });
-    if (response.ok) {
-      const savedPhoto = await response.json();
-      const updatedPhoto = { ...savedPhoto, username: loggedInUsername };
-      dispatch({ type: "ADD_PHOTO", payload: updatedPhoto });
-      setNewPhoto({ title: "", image: "", tags: [] }); // Reset form
-      calculateStatistics([...state.photos, updatedPhoto]); // Update statistics    
-    } else {
-      console.error("Failed to add photo");
-    }
+    setStatistics({totalPhotos, totalComments, topUser});
   };
 
   const handlePhotoLoad = (photoId) => {
     dispatch({ type: "PHOTO_LOADED", payload: photoId });
-  };
-
-  const handleDeletePhoto = async (photoId) => {
-    const url = `/api/photos/${photoId}`;
-    console.log("DELETE Request URL:", url);
-  
-    const response = await fetch(url, { method: "DELETE" });
-  
-    if (response.ok) {
-      console.log("Photo deleted successfully");
-      dispatch({ type: "DELETE_PHOTO", payload: photoId });
-    } else {
-      const errorText = await response.text();
-      console.error("Failed to delete photo:", errorText);
-    }
-  };  
-
-  // Open modal for editing
-  const handleEditPhoto = (photo) => {
-    setCurrentPhoto(photo);
-    setIsModalOpen(true);
-  };
-
-  // Update photo title
-  const handleUpdatePhoto = async () => {
-    const response = await fetch(`/api/photos/${currentPhoto._id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: currentPhoto.title, tags: currentPhoto.tags }),
-    });
-    const updatedPhoto = await response.json();
-    dispatch({ type: "UPDATE_PHOTO", payload: updatedPhoto });
-    setIsModalOpen(false);
-    setCurrentPhoto(null);
   };
 
   // == comments ==
@@ -230,16 +78,15 @@ export default function GalleryPage() {
 
       if (response.ok) {
         const updatedPhoto = await response.json();
-        // Preserve the username in the updated photo
         const photoWithUsername = {
           ...updatedPhoto,
           username: state.photos.find((photo) => photo._id === photoId).username,
         };
+        const updatedPhotos = state.photos.map(photo =>
+          photo._id === photoId ? photoWithUsername : photo
+        );
         dispatch({ type: "UPDATE_PHOTO", payload: photoWithUsername });
-        setPhotoComments((prevComments) => ({
-          ...prevComments,
-          [photoId]: "", // Clear the input after adding a comment
-        }));
+        calculateStatistics(updatedPhotos);
       } else {
         console.error("Failed to add comment");
       }
@@ -262,12 +109,15 @@ export default function GalleryPage() {
   
       if (response.ok) {
         const updatedPhoto = await response.json();
-        // Preserve the username in the updated photo
         const photoWithUsername = {
           ...updatedPhoto,
           username: state.photos.find((photo) => photo._id === photoId).username,
         };
+        const updatedPhotos = state.photos.map(photo =>
+          photo._id === photoId ? photoWithUsername : photo
+        );
         dispatch({ type: "UPDATE_PHOTO", payload: photoWithUsername });
+        calculateStatistics(updatedPhotos);
       } else {
         console.error("Failed to delete comment");
       }
@@ -275,54 +125,6 @@ export default function GalleryPage() {
       console.error("Error deleting comment:", error);
     }
   };
-  
-  const handleLikePhoto = useCallback(async (photoId) => {
-    try {
-      const response = await fetch(`/api/photos/${photoId}/like`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: loggedInUserId }),
-      });
-
-      if (response.ok) {
-        const updatedPhoto = await response.json();
-        // Preserve the username in the updated photo
-        const photoWithUsername = {
-          ...updatedPhoto,
-          username: state.photos.find((photo) => photo._id === photoId).username,
-        };
-        dispatch({ type: "UPDATE_PHOTO", payload: photoWithUsername });
-      } else {
-        console.error("Failed to like photo");
-      }
-    } catch (error) {
-      console.error("Error liking photo:", error);
-    }
-  }, [loggedInUserId, state.photos]);
-  
-  const handleUnlikePhoto = useCallback(async (photoId) => {
-    try {
-      const response = await fetch(`/api/photos/${photoId}/like`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: loggedInUserId }),
-      });
-
-      if (response.ok) {
-        const updatedPhoto = await response.json();
-        // Preserve the username in the updated photo
-        const photoWithUsername = {
-          ...updatedPhoto,
-          username: state.photos.find((photo) => photo._id === photoId).username,
-        };
-        dispatch({ type: "UPDATE_PHOTO", payload: photoWithUsername });
-      } else {
-        console.error("Failed to unlike photo");
-      }
-    } catch (error) {
-      console.error("Error unliking photo:", error);
-    }
-  }, [loggedInUserId, state.photos]);
   
   // == filter photos ==
   const filterPhotos = (photos) => {
@@ -356,18 +158,7 @@ export default function GalleryPage() {
   return (
     <div className="gallery-page">
       <h1>Gallery</h1>
-      <div className="sort-options">
-        <label htmlFor="sort">Sort by:</label>
-        <select
-          id="sort"
-          value={sortOption}
-          onChange={(e) => setSortOption(e.target.value)}
-        >
-          <option value="likes">Likes</option>
-          <option value="comments">Comments</option>
-          <option value="alphabetical">Alphabetically</option>
-        </select>
-      </div>
+      <SortOptions sortOption={sortOption} setSortOption={setSortOption} />
 
       <input
         type="text"
@@ -377,7 +168,7 @@ export default function GalleryPage() {
         className="search"
       />
       
-      <form onSubmit={handleAddPhoto} className="upload-form">
+      <form onSubmit={(e) => handleAddPhoto(e, newPhoto, loggedInUserId, loggedInUsername, dispatch, state, setNewPhoto,calculateStatistics)} className="upload-form">
         <input
           type="text"
           name="title"
@@ -423,9 +214,9 @@ export default function GalleryPage() {
             <div className="photo-likes">
               <p>{photo.likes?.length || 0} Likes</p>
               {photo.likes?.includes(loggedInUserId) ? (
-                <button onClick={() => handleUnlikePhoto(photo._id)}>Unlike</button>
+                <button onClick={() => handleUnlikePhoto(photo._id, loggedInUserId, dispatch, state)}>Unlike</button>
               ) : (
-                <button onClick={() => handleLikePhoto(photo._id)}>Like</button>
+                <button onClick={() => handleLikePhoto(photo._id, loggedInUserId, dispatch, state)}>Like</button>
               )}
             </div>
 
@@ -434,51 +225,17 @@ export default function GalleryPage() {
               Added by: <strong>{photo.username || "Anonymous"}</strong>
             </p>
 
-            {/* Comments */}
-            <div className="comments">
-              <h4>Comments</h4>
-              <ul>
-                {photo.comments.map((comment) => (
-                  <li key={comment._id}>
-                    <strong>{comment.username}:</strong> {comment.text}
-                    {comment.userId === loggedInUserId && (
-                      <button
-                        onClick={() => handleDeleteComment(photo._id, comment._id)}
-                        className="delete-comment-button"
-                      >
-                        Delete
-                      </button>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="add-comment">
-              <input
-                type="text"
-                placeholder="Add a comment"
-                value={photoComments[photo._id] || ""}
-                onChange={(e) =>
-                  setPhotoComments({
-                    ...photoComments,
-                    [photo._id]: e.target.value,
-                  })
-                }
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleAddComment(photo._id, photoComments[photo._id]);
-                  }
-                }}
-              />
-              <button onClick={() => handleAddComment(photo._id, photoComments[photo._id])}>
-                Post
-              </button>
-            </div>
+            <Comments
+              photo={photo}
+              loggedInUserId={loggedInUserId}
+              handleAddComment={handleAddComment}
+              handleDeleteComment={handleDeleteComment}
+            />
 
             {photo.userId === loggedInUserId && (
               <div className="gallery-actions">
-                <button onClick={() => handleEditPhoto(photo)}>Edit</button>
-                <button onClick={() => handleDeletePhoto(photo._id)}>Delete</button>
+                <button onClick={() => handleEditPhoto(photo, setCurrentPhoto, setIsModalOpen)}>Edit</button>
+                <button onClick={() => handleDeletePhoto(photo._id, dispatch, state, calculateStatistics)}>Delete</button>
               </div>
             )}
           </div>
@@ -505,23 +262,14 @@ export default function GalleryPage() {
               }
             />
             <div className="modal-actions">
-              <button onClick={handleUpdatePhoto}>Save</button>
+              <button onClick={() => handleUpdatePhoto(currentPhoto, dispatch, setIsModalOpen, setCurrentPhoto)}>Save</button>
               <button onClick={() => setIsModalOpen(false)}>Cancel</button>
             </div>
           </div>
         </div>
       )}
 
-      <div className="statistics">
-        <h2>Gallery Statistics</h2>
-        <p>Total Photos: {statistics.totalPhotos}</p>
-        <p>Total Comments: {statistics.totalComments}</p>
-        {statistics.topUser && (
-          <p>
-            User with the most photos posted: {statistics.topUser.username} ({statistics.topUser.count} photos)
-          </p>
-        )}
-      </div>
+      <Statistics statistics={statistics} />
     </div>
   );
 }
