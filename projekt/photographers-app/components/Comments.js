@@ -7,7 +7,7 @@ export default function Comments({ photo, loggedInUserId, handleAddComment, hand
     handleAddComment(photoId, commentText);
     setPhotoComments((prevComments) => ({
       ...prevComments,
-      [photoId]: "", // Clear the input
+      [photoId]: "", // clear the input
     }));
   };
 

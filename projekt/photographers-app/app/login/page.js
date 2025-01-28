@@ -8,6 +8,7 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -34,6 +35,7 @@ export default function LoginPage() {
 
       if (!response.ok) {
         const error = await response.text();
+        setPasswordError(true);
         throw new Error(error);
       }
 
@@ -44,6 +46,7 @@ export default function LoginPage() {
       setMessage("Login successful!");
       setFormData({ email: "", password: "" });
       setIsLoggedIn(true);
+      setPasswordError(false);
 
       router.push("/");
     } catch (error) {
@@ -81,6 +84,7 @@ export default function LoginPage() {
             value={formData.password}
             onChange={handleInputChange}
             required
+            className={passwordError ? "input-error" : ""}
           />
           <button type="submit">Login</button>
         </form>

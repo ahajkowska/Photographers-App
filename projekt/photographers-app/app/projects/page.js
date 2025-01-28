@@ -6,6 +6,7 @@ import * as Yup from "yup";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Timeline from "../../components/Timeline";
+import Link from "next/link";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
@@ -15,8 +16,10 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
-    setLoggedInUserId(userId);
-    fetchProjects(userId);
+    if (userId) {
+      setLoggedInUserId(userId);
+      fetchProjects(userId);
+    }
   }, []);
 
   const fetchProjects = async (userId) => {
@@ -109,185 +112,193 @@ export default function ProjectsPage() {
 
   return (
     <div className="projects-page">
-      <h1>Projects</h1>
+      {loggedInUserId ? (
+        <>
+          <h1>Projects</h1>
 
-      <Formik
-        initialValues={
-          currentProject || {
-            title: "",
-            equipment: [""],
-            idea: "",
-            deadlines: [{ date: null, description: "" }],
-            images: [{ title: "", url: "" }],
-          }
-        }
-        enableReinitialize
-        validationSchema={validationSchema}
-        onSubmit={(values, { resetForm }) => {
-          handleSaveProject(values);
-          resetForm();
-        }}
-      >
-        {({ values, setFieldValue, errors, touched }) => (
-          <Form className="project-form">
-            {/* Project Title */}
-            <div>
-              <label htmlFor="title">Project Title</label>
-              <Field
-                id="title"
-                name="title"
-                placeholder="Enter project title"
-                className={`form-field ${
-                  errors.title && touched.title ? "error-field" : ""
-                }`}
-              />
-              {errors.title && touched.title && (
-                <div className="error-message">{errors.title}</div>
-              )}
-            </div>
-
-            {/* Equipment Section */}
-            <div>
-              <label>Equipment</label>
-              <FieldArray name="equipment">
-                {({ push, remove }) => (
-                  <div>
-                    {values.equipment.map((item, index) => (
-                      <div key={index} style={{ display: "flex", gap: "10px" }}>
-                        <Field
-                          name={`equipment[${index}]`}
-                          placeholder="Enter equipment"
-                          className="form-field"
-                        />
-                        <button type="button" onClick={() => remove(index)}>
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                    <button type="button" onClick={() => push("")}>
-                      Add Equipment
-                    </button>
-                  </div>
-                )}
-              </FieldArray>
-            </div>
-
-            {/* Idea Section */}
-            <div>
-              <label htmlFor="idea">Project Idea</label>
-              <Field
-                id="idea"
-                name="idea"
-                placeholder="Describe your project idea (optional)"
-                as="textarea"
-                rows="4"
-                className="form-field"
-              />
-            </div>
-
-            {/* Dates and Deadlines Section */}
-            <div>
-              <label>Dates & Deadlines</label>
-              <FieldArray name="deadlines">
-                {({ push, remove }) => (
-                  <div>
-                    {values.deadlines.map((deadline, index) => (
-                      <div key={index} style={{ display: "flex", gap: "10px" }}>
-                        <DatePicker
-                          selected={deadline.date}
-                          onChange={(date) =>
-                            setFieldValue(`deadlines[${index}].date`, date)
-                          }
-                          placeholderText="Pick a date"
-                          className="form-field"
-                        />
-                        <Field
-                          name={`deadlines[${index}].description`}
-                          placeholder="What's this deadline about?"
-                          className="form-field"
-                        />
-                        <button type="button" onClick={() => remove(index)}>
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => push({ date: null, description: "" })}
-                    >
-                      Add Deadline
-                    </button>
-                  </div>
-                )}
-              </FieldArray>
-            </div>
-
-            {/* Images Section */}
-            <div>
-              <label>Images</label>
-              <FieldArray name="images">
-                {({ push, remove }) => (
-                  <div>
-                    {values.images.map((image, index) => (
-                      <div key={index} style={{ display: "flex", gap: "10px" }}>
-                        <Field
-                          name={`images[${index}].title`}
-                          placeholder="Image Title"
-                          className="form-field"
-                        />
-                        <Field
-                          name={`images[${index}].url`}
-                          placeholder="Image URL"
-                          className="form-field"
-                        />
-                        <button type="button" onClick={() => remove(index)}>
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                    <button type="button" onClick={() => push({ title: "", url: "" })}>
-                      Add Image
-                    </button>
-                  </div>
-                )}
-              </FieldArray>
-            </div>
-
-            <button type="submit" className="form-submit">
-              {isEditing ? "Update Project" : "Add Project"}
-            </button>
-          </Form>
-        )}
-      </Formik>
-
-      {/* Project List */}
-      <div className="project-list">
-        {projects.map((project) => (
-          <div key={project._id} className="project-card">
-            <h3>{project.title}</h3>
-            <p><strong>Equipment:</strong> {project.equipment.join(", ") || "None"}</p>
-            <p><strong>Idea:</strong> {project.idea || "No idea yet"}</p>
-
-            <p><strong>Timeline:</strong></p>
-            <Timeline deadlines={project.deadlines} />
-
-            <p><strong>Images:</strong></p>
-            <div className="image-cards">
-              {project.images.map((image, i) => (
-                <div key={i} className="image-card">
-                  <img src={image.url} alt={image.title} />
-                  <p>{image.title}</p>
+          <Formik
+            initialValues={
+              currentProject || {
+                title: "",
+                equipment: [""],
+                idea: "",
+                deadlines: [{ date: null, description: "" }],
+                images: [{ title: "", url: "" }],
+              }
+            }
+            enableReinitialize
+            validationSchema={validationSchema}
+            onSubmit={(values, { resetForm }) => {
+              handleSaveProject(values);
+              resetForm();
+            }}
+          >
+            {({ values, setFieldValue, errors, touched }) => (
+              <Form className="project-form">
+                {/* Project Title */}
+                <div>
+                  <label htmlFor="title">Project Title</label>
+                  <Field
+                    id="title"
+                    name="title"
+                    placeholder="Enter project title"
+                    className={`form-field ${
+                      errors.title && touched.title ? "error-field" : ""
+                    }`}
+                  />
+                  {errors.title && touched.title && (
+                    <div className="error-message">{errors.title}</div>
+                  )}
                 </div>
-              ))}
-            </div>
 
-            <div style={{ display: "flex", gap: "10px" }}>
-              <button onClick={() => handleEditProject(project)}>Edit</button>
-              <button onClick={() => handleDeleteProject(project._id)}>Delete</button>
-            </div>
+                {/* Equipment Section */}
+                <div>
+                  <label>Equipment</label>
+                  <FieldArray name="equipment">
+                    {({ push, remove }) => (
+                      <div>
+                        {values.equipment.map((item, index) => (
+                          <div key={index} style={{ display: "flex", gap: "10px" }}>
+                            <Field
+                              name={`equipment[${index}]`}
+                              placeholder="Enter equipment"
+                              className="form-field"
+                            />
+                            <button type="button" onClick={() => remove(index)}>
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                        <button type="button" onClick={() => push("")}>
+                          Add Equipment
+                        </button>
+                      </div>
+                    )}
+                  </FieldArray>
+                </div>
+
+                {/* Idea Section */}
+                <div>
+                  <label htmlFor="idea">Project Idea</label>
+                  <Field
+                    id="idea"
+                    name="idea"
+                    placeholder="Describe your project idea (optional)"
+                    as="textarea"
+                    rows="4"
+                    className="form-field"
+                  />
+                </div>
+
+                {/* Dates and Deadlines Section */}
+                <div>
+                  <label>Dates & Deadlines</label>
+                  <FieldArray name="deadlines">
+                    {({ push, remove }) => (
+                      <div>
+                        {values.deadlines.map((deadline, index) => (
+                          <div key={index} style={{ display: "flex", gap: "10px" }}>
+                            <DatePicker
+                              selected={deadline.date}
+                              onChange={(date) =>
+                                setFieldValue(`deadlines[${index}].date`, date)
+                              }
+                              placeholderText="Pick a date"
+                              className="form-field"
+                            />
+                            <Field
+                              name={`deadlines[${index}].description`}
+                              placeholder="What's this deadline about?"
+                              className="form-field"
+                            />
+                            <button type="button" onClick={() => remove(index)}>
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => push({ date: null, description: "" })}
+                        >
+                          Add Deadline
+                        </button>
+                      </div>
+                    )}
+                  </FieldArray>
+                </div>
+
+                {/* Images Section */}
+                <div>
+                  <label>Images</label>
+                  <FieldArray name="images">
+                    {({ push, remove }) => (
+                      <div>
+                        {values.images.map((image, index) => (
+                          <div key={index} style={{ display: "flex", gap: "10px" }}>
+                            <Field
+                              name={`images[${index}].title`}
+                              placeholder="Image Title"
+                              className="form-field"
+                            />
+                            <Field
+                              name={`images[${index}].url`}
+                              placeholder="Image URL"
+                              className="form-field"
+                            />
+                            <button type="button" onClick={() => remove(index)}>
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                        <button type="button" onClick={() => push({ title: "", url: "" })}>
+                          Add Image
+                        </button>
+                      </div>
+                    )}
+                  </FieldArray>
+                </div>
+
+                <button type="submit" className="form-submit">
+                  {isEditing ? "Update Project" : "Add Project"}
+                </button>
+              </Form>
+            )}
+          </Formik>
+
+          {/* Project List */}
+          <div className="project-list">
+            {projects.map((project) => (
+              <div key={project._id} className="project-card">
+                <h3>{project.title}</h3>
+                <p><strong>Equipment:</strong> {project.equipment.join(", ") || "None"}</p>
+                <p><strong>Idea:</strong> {project.idea || "No idea yet"}</p>
+
+                <p><strong>Timeline:</strong></p>
+                <Timeline deadlines={project.deadlines} />
+
+                <p><strong>Images:</strong></p>
+                <div className="image-cards">
+                  {project.images.map((image, i) => (
+                    <div key={i} className="image-card">
+                      <img src={image.url} alt={image.title} />
+                      <p>{image.title}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <button onClick={() => handleEditProject(project)}>Edit</button>
+                  <button onClick={() => handleDeleteProject(project._id)}>Delete</button>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </>
+      ) : (
+        <p>
+          You must be logged in to view projects. Please <Link href="/login">log in</Link>.
+        </p>
+      )}
     </div>
   );
 }
