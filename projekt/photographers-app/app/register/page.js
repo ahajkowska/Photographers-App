@@ -37,7 +37,7 @@ export default function RegisterPage() {
     return (
         <div className="register-page">
         <h1>Register</h1>
-        <button className="go-back"><Link href="/login">Go back</Link></button>
+        <button className="go-back" onClick={() => window.history.back()}>Go back</button>
         <form onSubmit={handleSubmit} className="register-form">
             <input
             type="text"

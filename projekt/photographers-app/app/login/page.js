@@ -1,13 +1,21 @@
 "use client";
 
 import Link from 'next/link';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (userId) {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -35,6 +43,7 @@ export default function LoginPage() {
       
       setMessage("Login successful!");
       setFormData({ email: "", password: "" });
+      setIsLoggedIn(true);
 
       router.push("/");
     } catch (error) {
@@ -42,28 +51,40 @@ export default function LoginPage() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("userId");
+    localStorage.removeItem("username");
+    setIsLoggedIn(false);
+    setMessage("Logged out successfully.");
+  };
+
   return (
     <div className="login-page">
       <h1>Login</h1>
-      <form onSubmit={handleSubmit} className="login-form">
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleInputChange}
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleInputChange}
-          required
-        />
-        <button type="submit">Login</button>
-      </form>
+      <button className="go-back" onClick={() => window.history.back()}>Go back</button>
+      {isLoggedIn ? (
+        <button className="logout-button" onClick={handleLogout}>Logout</button>
+      ) : (
+        <form onSubmit={handleSubmit} className="login-form">
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleInputChange}
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleInputChange}
+            required
+          />
+          <button type="submit">Login</button>
+        </form>
+      )}
       <p><Link href="/register">Don't have an account? Click here.</Link></p>
       {message && <p>{message}</p>}
     </div>

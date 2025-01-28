@@ -1,17 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Reset Styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Global Styles */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Roboto', sans-serif;
   line-height: 1.6;
   margin: 0;
   padding: 0;
@@ -23,36 +17,61 @@ body {
   min-height: 100vh;
 }
 
-/* Theme Classes */
+:root {
+  --bg-color-light: #ffffff;
+  --text-color-light: #333333;
+  --card-bg-light: #f4f4f4;
+  --button-bg-light: #ff6f61; 
+  --button-text-light: #ffffff;
+
+  --bg-color-dark: #181818;
+  --text-color-dark: #f1fbfd;
+  --card-bg-dark: #37474f;
+  --button-bg-dark: #ff6f61; 
+  --button-text-dark: #ffffff;
+
+  --red-color: #dc3545;
+  --red-color-hover: #c82333;
+  --blue-color: #0070f3;
+  --blue-color-hover: #0056b3;
+  --black-color: #181818;
+
+  --link-color-light: #0070f3;
+  --link-color-hover-light: #3291ff;
+  --link-color-dark: #66b3ff;
+  --link-color-hover-dark: #99ccff;
+}
+
 .theme-light {
-  --bg-color: #ffffff;
-  --text-color: #000000;
-  --card-bg: #f9f9f9;
-  --button-bg: #0070f3;
-  --button-text: #ffffff;
+  --bg-color: var(--bg-color-light);
+  --text-color: var(--text-color-light);
+  --card-bg: var(--card-bg-light);
+  --button-bg: var(--button-bg-light);
+  --button-text: var(--button-text-light);
+  --link-color: var(--link-color-light);
+  --link-color-hover: var(--link-color-hover-light);
 }
 
 .theme-dark {
-  --bg-color: #181818;
-  --text-color: #8f8f8f;
-  --card-bg: #252525;
-  --button-bg: #1e90ff;
-  --button-text: #ffffff;
+  --bg-color: var(--bg-color-dark);
+  --text-color: var(--text-color-dark);
+  --card-bg: var(--card-bg-dark);
+  --button-bg: var(--button-bg-dark);
+  --button-text: var(--button-text-dark);
+  --link-color: var(--link-color-dark);
+  --link-color-hover: var(--link-color-hover-dark);
 }
 
-/* Lists */
 ul {
   list-style: none;
   padding: 0;
 }
 
-/* Main Content */
 main {
   padding: 20px;
   flex: 1;
 }
 
-/* Project Card */
 .project-card {
   background-color: var(--card-bg);
   border: 1px solid var(--text-color);
@@ -62,7 +81,6 @@ main {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Buttons */
 button {
   background-color: var(--button-bg);
   color: var(--button-text);
@@ -71,6 +89,8 @@ button {
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
+  font-weight: bold;
+  font-size: 1rem;
 }
 
 button:hover {
@@ -80,6 +100,7 @@ button:hover {
 .theme-toggle-button {
   font-size: 13px;
   margin: 10px;
+  max-width: fit-content;
 }
 
 .homepage {
@@ -92,32 +113,39 @@ button:hover {
 }
 
 .homepage h1 {
+  font-family: 'Lato', sans-serif;
   font-size: 2.5rem;
   color: var(--text-color);
   margin-bottom: 10px;
+  text-shadow: 1px 1px #ccc;
 }
 
 .homepage p {
+  font-family: 'Roboto', sans-serif;
   font-size: 1.2rem;
   color: var(--text-color);
   margin-bottom: 20px;
 }
 
-.gallery-loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 50vh;
-  font-size: 1.5rem;
-  color: #666;
+.get-started-button > a {
+  color: var(--button-text);
 }
 
-.loading-indicator {
-  text-align: center;
-  color: #999;
-  font-size: 1rem;
+.get-started-button > a:hover {
+  color: var(--button-text);
+  text-decoration: underline;
 }
 
-.theme-toggle-button {
-  max-width: fit-content;
+.get-started-button {
+  margin: 0 5px;
+}
+a {
+  color: var(--link-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--link-color-hover);
+  text-decoration: underline;
 }

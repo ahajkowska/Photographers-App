@@ -332,7 +332,7 @@ export default function TaskPage() {
             <button onClick={() => handleDeleteTask(index)}>Delete Task</button>
           </div>
         ))}
-        <button onClick={handleAddTask}>Add Task</button>
+        <button className="add-task-button" onClick={handleAddTask}>Add Task</button>
 
         <h3>Equipment:</h3>
         {equipment.map((item, index) => (
@@ -354,9 +354,9 @@ export default function TaskPage() {
             <button onClick={() => handleDeleteEquipment(index)}>Delete Equipment</button>
           </div>
         ))}
-        <div className="equipment-buttons">
-          <button onClick={handleAddEquipment}>Add Equipment</button>
-          <button onClick={saveTaskList}>{editingListId ? "Update Task List" : "Save Task List"}</button>
+        <div className="task-buttons">
+          <button className="add-equipment-button" onClick={handleAddEquipment}>Add Equipment</button>
+          <button className="save-task-list-button" onClick={saveTaskList}>{editingListId ? "Update Task List" : "Save Task List"}</button>
         </div>
       </div>
 

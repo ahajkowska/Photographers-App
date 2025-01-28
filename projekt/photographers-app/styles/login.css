@@ -1,97 +1,92 @@
-.register-page {
-  max-width: 400px;
-  margin: 30px auto;
-  padding: 20px;
-  background-color: var(--card-bg);
-  border: 1px solid var(--text-color);
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.register-page h1 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: var(--text-color);
-}
-
-.register-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.register-form input {
-  padding: 10px;
-  border: 1px solid var(--text-color);
-  border-radius: 4px;
-  font-size: 16px;
-}
-
-.register-form button {
-  padding: 10px;
-  background-color: var(--button-bg);
-  color: var(--button-text);
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.register-form button:hover {
-  opacity: 0.9;
-}
-
-.register-page p {
-  text-align: center;
-  color: var(--text-color);
-}
-
+.register-page,
 .login-page {
   max-width: 400px;
   margin: 30px auto;
-  padding: 20px;
+  padding: 30px;
   background-color: var(--card-bg);
   border: 1px solid var(--text-color);
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.3s ease;
 }
 
+.register-page:hover,
+.login-page:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.register-page h1,
 .login-page h1 {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   color: var(--text-color);
+  font-size: 24px;
 }
 
+.register-form,
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
 }
 
+.register-form input,
 .login-form input {
-  padding: 10px;
+  padding: 12px;
   border: 1px solid var(--text-color);
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 16px;
+  transition: border-color 0.3s ease;
 }
 
+.register-form input:focus,
+.login-form input:focus {
+  border-color: var(--button-bg);
+  outline: none;
+}
+
+.register-form button,
 .login-form button {
-  padding: 10px;
+  padding: 12px;
   background-color: var(--button-bg);
   color: var(--button-text);
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
+.register-form button:hover,
 .login-form button:hover {
-  opacity: 0.9;
+  background-color: darken(var(--button-bg), 10%);
+  transform: translateY(-2px);
 }
 
+.register-page p,
 .login-page p {
   text-align: center;
   color: var(--text-color);
+  margin-top: 15px;
 }
 
 .go-back {
-  margin-bottom: 10px;
+  margin-bottom: 20px;
+  width: 100px;
+}
+
+.go-back:hover {
+  background-color: darken(var(--button-bg), 10%);
+  transform: translateY(-2px);
+}
+
+.logout-button {
+  margin-top: 10px;
+  display: block;
+  width: 100px;
+}
+
+.logout-button:hover {
+  background-color: darken(var(--button-bg), 10%);
+  transform: translateY(-2px);
 }

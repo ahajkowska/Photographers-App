@@ -1,4 +1,3 @@
-/* Gallery Container */
 .gallery-container {
   display: grid;
   grid-template-columns: repeat(3, minmax(200px, 1fr));
@@ -6,13 +5,12 @@
   padding: 20px 0;
 }
 
-/* Individual Gallery Item */
 .gallery-item {
-  border: 1px solid #ddd;
+  border: 1px solid var(--card-bg);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: white;
+  background-color: var(--card-bg);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -27,7 +25,7 @@
   padding: 8px;
   font-weight: bold;
   font-size: 1.1rem;
-  color: #333;
+  color: var(--text-color);
 }
 
 .gallery-item:hover {
@@ -35,7 +33,6 @@
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* Action Buttons */
 .gallery-actions {
   display: flex;
   justify-content: center;
@@ -45,8 +42,8 @@
 
 .gallery-actions button {
   padding: 8px 12px;
-  background-color: #0070f3;
-  color: white;
+  background-color: var(--blue-color);
+  color: var(--button-text);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -54,10 +51,9 @@
 }
 
 .gallery-actions button:hover {
-  background-color: #005bb5;
+  background-color: var(--blue-color-hover);
 }
 
-/* Upload Form */
 .upload-form {
   display: flex;
   gap: 10px;
@@ -75,8 +71,7 @@ input {
 
 .upload-form button {
   padding: 10px 20px;
-  background-color: #0070f3;
-  color: white;
+  color: var(--button-text);
   border: none;
   border-radius: 4px;
   font-size: 1rem;
@@ -85,10 +80,9 @@ input {
 }
 
 .upload-form button:hover {
-  background-color: #005bb5;
+  background-color: var(--blue-color-hover);
 }
 
-/* Modal Styles */
 .modal {
   position: fixed;
   top: 0;
@@ -103,7 +97,7 @@ input {
 }
 
 .modal-content {
-  background-color: white;
+  background-color: var(--card-bg);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -133,17 +127,17 @@ input {
 }
 
 .modal-actions button:first-child {
-  background-color: #0070f3;
-  color: white;
+  background-color: var(--blue-color);
+  color: var(--button-text);
 }
 
 .modal-actions button:last-child {
   background-color: #aaa;
-  color: white;
+  color: var(--button-text);
 }
 
 .modal-actions button:first-child:hover {
-  background-color: #005bb5;
+  background-color: var(--blue-color-hover);
 }
 
 .modal-actions button:last-child:hover {
@@ -153,9 +147,10 @@ input {
 .comments {
   margin-top: 10px;
   padding: 10px;
-  background-color: #f9f9f9;
+  background-color: var(--card-bg);
   border: 1px solid #ddd;
-  border-radius: 5px;
+  border: none;
+
 }
 
 .comments h4 {
@@ -187,20 +182,18 @@ input {
 
 .add-comment button {
   padding: 8px 15px;
-  background-color: #007bff;
-  color: white;
+  background-color: var(--blue-color);
+  color: var(--button-text);
   border: none;
   border-radius: 5px;
   cursor: pointer;
 }
 
 .add-comment button:hover {
-  background-color: #0056b3;
+  background-color: var(--blue-color-hover);
 }
 
-/* Sekcja statystyk */
 .statistics {
-  background-color: #ffffff;
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 10px;
@@ -210,6 +203,7 @@ input {
 .statistics h2 {
   font-size: 1.8rem;
   margin-bottom: 15px;
+  color: var(--button-bg);
 }
 
 .statistics p {
@@ -218,7 +212,7 @@ input {
 }
 .delete-comment-button {
   margin-left: 10px;
-  background-color: #dc3545;
+  background-color: var(--red-color);
   color: #ffffff;
   border: none;
   padding: 5px 10px;
@@ -229,7 +223,7 @@ input {
 }
 
 .delete-comment-button:hover {
-  background-color: #c82333;
+  background-color: var(--red-color-hover);
 }
 
 .photo-likes {
@@ -241,14 +235,10 @@ input {
 .photo-likes button {
   padding: 5px 10px;
   border: none;
-  background-color: #0070f3;
-  color: white;
+  background-color: var(--blue-color);
+  color: var(--button-text);
   border-radius: 4px;
   cursor: pointer;
-}
-
-.photo-likes button:hover {
-  background-color: #005bb5;
 }
 
 .sort-options {
@@ -276,5 +266,5 @@ input {
   text-align: center;
   margin-bottom: 20px;
   font-size: 2rem;
-  color: #0070f3;
+  color: var(--button-bg);
 }
