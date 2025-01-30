@@ -17,29 +17,58 @@ body {
   min-height: 100vh;
 }
 
-:root {
-  --bg-color-light: #ffffff;
-  --text-color-light: #333333;
-  --card-bg-light: #f4f4f4;
-  --button-bg-light: #ff6f61; 
-  --button-text-light: #ffffff;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  --bg-color-dark: #181818;
-  --text-color-dark: #f1fbfd;
-  --card-bg-dark: #37474f;
-  --button-bg-dark: #ff6f61; 
+body {
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+:root {
+  --bg-color-light: #f8f9fa;
+  --text-color-light: #212529;
+  --card-bg-light: #ffffff;
+  --button-bg-light: #ff6f61;
+  --button-text-light: #ffffff;
+  --button-hover-light: #e05650;
+
+  --bg-color-dark: #121212;
+  --text-color-dark: #e0e0e0;
+  --card-bg-dark: #1e1e1e;
+  --button-bg-dark: #3a3d98;
   --button-text-dark: #ffffff;
+  --button-hover-dark: #2a2d78;
+
+  --primary-color: #ff6f61;
+  --secondary-color: #3a3d98;
+  --accent-color: #009688;
+  --gradient-start-light: #ff6f61;
+  --gradient-end-light: #3a3d98;
+  --gradient-start-dark: #1e1e1e;
+  --gradient-end-dark: #3a3d98;
+
+  --link-color-light: #ff6f61;
+  --link-color-hover-light: #ff907d;
+  --link-color-dark: #ffcc00;
+  --link-color-hover-dark: #e6b800;
 
   --red-color: #dc3545;
   --red-color-hover: #c82333;
   --blue-color: #0070f3;
   --blue-color-hover: #0056b3;
   --black-color: #181818;
-
-  --link-color-light: #0070f3;
-  --link-color-hover-light: #3291ff;
-  --link-color-dark: #66b3ff;
-  --link-color-hover-dark: #99ccff;
 }
 
 .theme-light {
@@ -48,8 +77,11 @@ body {
   --card-bg: var(--card-bg-light);
   --button-bg: var(--button-bg-light);
   --button-text: var(--button-text-light);
+  --button-hover: var(--button-hover-light);
   --link-color: var(--link-color-light);
   --link-color-hover: var(--link-color-hover-light);
+  --gradient-start: var(--gradient-start-light);
+  --gradient-end: var(--gradient-end-light);
 }
 
 .theme-dark {
@@ -58,8 +90,11 @@ body {
   --card-bg: var(--card-bg-dark);
   --button-bg: var(--button-bg-dark);
   --button-text: var(--button-text-dark);
+  --button-hover: var(--button-hover-dark);
   --link-color: var(--link-color-dark);
   --link-color-hover: var(--link-color-hover-dark);
+  --gradient-start: var(--gradient-start-dark);
+  --gradient-end: var(--gradient-end-dark);
 }
 
 ul {
@@ -94,6 +129,7 @@ button {
 }
 
 button:hover {
+  background-color: var(--secondary-color);
   opacity: 0.9;
 }
 
@@ -104,7 +140,7 @@ button:hover {
 }
 
 .homepage {
-  background-color: var(--card-bg);
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
   text-align: center;
   padding: 50px 20px;
   margin-bottom: 40px;

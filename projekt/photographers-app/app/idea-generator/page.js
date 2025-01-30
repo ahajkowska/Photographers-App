@@ -32,7 +32,6 @@ export default function IdeaGeneratorPage() {
     const theme = generateTheme();
     const challenge = generateChallenge();
   
-    // Zaktualizuj wszystkie stany
     setGeneratedLocation(location);
     setGeneratedPerson(person);
     setGeneratedColor(color);

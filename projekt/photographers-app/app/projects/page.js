@@ -5,6 +5,7 @@ import { Formik, Form, Field, FieldArray } from "formik";
 import * as Yup from "yup";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { handleSaveProject, handleEditProject, handleDeleteProject } from "../../handlers/projectHandlers";
 import Timeline from "../../components/Timeline";
 import Link from "next/link";
 
@@ -58,58 +59,6 @@ export default function ProjectsPage() {
       .min(1, "You must add at least one deadline"),
   });
 
-  const handleSaveProject = async (values) => {
-    try {
-      if (isEditing) {
-        const response = await fetch("/api/projects", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: currentProject._id, userId: loggedInUserId, ...values }),
-        });
-        const updatedProject = await response.json();
-        setProjects(
-          projects.map((project) =>
-            project._id === updatedProject._id ? updatedProject : project
-          )
-        );
-        setIsEditing(false);
-        setCurrentProject(null);
-      } else {
-        const response = await fetch("/api/projects", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: loggedInUserId, ...values }),
-        });
-        const newProject = await response.json();
-        setProjects([...projects, newProject]);
-      }
-    } catch (error) {
-      console.error("Error saving project:", error.message);
-    }
-  };
-
-  const handleEditProject = (project) => {
-    setIsEditing(true);
-    setCurrentProject(project);
-  };
-
-  const handleDeleteProject = async (id) => {
-    try {
-      const response = await fetch("/api/projects", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, userId: loggedInUserId }),
-      });
-      if (response.ok) {
-        setProjects(projects.filter((project) => project._id !== id));
-      } else {
-        console.error("Failed to delete project");
-      }
-    } catch (error) {
-      console.error("Error deleting project:", error.message);
-    }
-  };
-
   return (
     <div className="projects-page">
       {loggedInUserId ? (
@@ -129,7 +78,7 @@ export default function ProjectsPage() {
             enableReinitialize
             validationSchema={validationSchema}
             onSubmit={(values, { resetForm }) => {
-              handleSaveProject(values);
+              handleSaveProject(values, isEditing, currentProject, loggedInUserId, projects , setProjects, setIsEditing, setCurrentProject);
               resetForm();
             }}
           >
@@ -142,9 +91,7 @@ export default function ProjectsPage() {
                     id="title"
                     name="title"
                     placeholder="Enter project title"
-                    className={`form-field ${
-                      errors.title && touched.title ? "error-field" : ""
-                    }`}
+                    className={`form-field ${errors.title && touched.title ? "error-field" : ""}`}
                   />
                   {errors.title && touched.title && (
                     <div className="error-message">{errors.title}</div>
@@ -200,9 +147,7 @@ export default function ProjectsPage() {
                           <div key={index} style={{ display: "flex", gap: "10px" }}>
                             <DatePicker
                               selected={deadline.date}
-                              onChange={(date) =>
-                                setFieldValue(`deadlines[${index}].date`, date)
-                              }
+                              onChange={(date) => setFieldValue(`deadlines[${index}].date`, date)}
                               placeholderText="Pick a date"
                               className="form-field"
                             />
@@ -216,10 +161,7 @@ export default function ProjectsPage() {
                             </button>
                           </div>
                         ))}
-                        <button
-                          type="button"
-                          onClick={() => push({ date: null, description: "" })}
-                        >
+                        <button type="button" onClick={() => push({ date: null, description: "" })}>
                           Add Deadline
                         </button>
                       </div>
@@ -280,15 +222,19 @@ export default function ProjectsPage() {
                 <div className="image-cards">
                   {project.images.map((image, i) => (
                     <div key={i} className="image-card">
-                      <img src={image.url} alt={image.title} />
+                      {image.url ? (
+                        <img src={image.url} alt={image.title} />
+                      ) : (
+                        <p>No image available</p>
+                      )}
                       <p>{image.title}</p>
                     </div>
                   ))}
                 </div>
 
                 <div style={{ display: "flex", gap: "10px" }}>
-                  <button onClick={() => handleEditProject(project)}>Edit</button>
-                  <button onClick={() => handleDeleteProject(project._id)}>Delete</button>
+                  <button onClick={() => handleEditProject(project, setIsEditing, setCurrentProject)}>Edit</button>
+                  <button onClick={() => handleDeleteProject(project._id, loggedInUserId, setProjects, projects)}>Delete</button>
                 </div>
               </div>
             ))}
