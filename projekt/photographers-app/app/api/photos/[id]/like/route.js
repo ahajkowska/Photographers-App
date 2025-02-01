@@ -6,7 +6,7 @@ export async function POST(req, { params }) {
 
   try {
     const { id } = params; // Photo ID
-    const { userId } = await req.json(); // User ID
+    const { userId } = await req.json();
 
     if (!id || !userId) {
       return new Response("Invalid input", { status: 400 });
@@ -34,7 +34,7 @@ export async function DELETE(req, { params }) {
 
   try {
     const { id } = params; // Photo ID
-    const { userId } = await req.json(); // User ID
+    const { userId } = await req.json();
 
     if (!id || !userId) {
       return new Response("Invalid input", { status: 400 });

@@ -12,7 +12,7 @@ export async function POST(req, { params }) {
       return new Response("Invalid input", { status: 400 });
     }
 
-    // Add the comment to the photo
+    // comment to the photo
     const updatedPhoto = await Photo.findByIdAndUpdate(
       id,
       {
@@ -38,12 +38,12 @@ export async function DELETE(req, { params }) {
   try {
     const { photoId, commentId, userId } = await req.json();
 
-    // Find photo and remove comment
+    // find photo and remove comment
     const updatedPhoto = await Photo.findByIdAndUpdate(
       photoId,
       {
         $pull: {
-          comments: { _id: commentId, userId }, // Remove only if the comment belongs to the user
+          comments: { _id: commentId, userId }, // remove only if the comment belongs to the user
         },
       },
       { new: true }

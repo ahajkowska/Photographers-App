@@ -10,7 +10,6 @@ import SortOptions from "../../components/SortOptions";
 
 export default function GalleryPage() {
   const { state, dispatch } = useGallery();
-
   const [newPhoto, setNewPhoto] = useState({ title: "", image: "", tags: [] });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPhoto, setCurrentPhoto] = useState(null);
@@ -29,7 +28,6 @@ export default function GalleryPage() {
       setLoggedInUsername(username);
   
       const userMap = await fetchUsers();
-  
       await fetchPhotos(userMap, dispatch, calculateStatistics);
       setIsLoading(false); 
     };
