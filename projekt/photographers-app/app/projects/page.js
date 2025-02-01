@@ -84,7 +84,6 @@ export default function ProjectsPage() {
           >
             {({ values, setFieldValue, errors, touched }) => (
               <Form className="project-form">
-                {/* Project Title */}
                 <div>
                   <label htmlFor="title">Project Title</label>
                   <Field
@@ -98,7 +97,6 @@ export default function ProjectsPage() {
                   )}
                 </div>
 
-                {/* Equipment Section */}
                 <div>
                   <label>Equipment</label>
                   <FieldArray name="equipment">
@@ -109,11 +107,16 @@ export default function ProjectsPage() {
                             <Field
                               name={`equipment[${index}]`}
                               placeholder="Enter equipment"
-                              className="form-field"
+                              className={`form-field ${
+                                errors.equipment?.[index] && touched.equipment?.[index] ? "error-field" : ""
+                              }`}
                             />
-                            <button type="button" onClick={() => remove(index)}>
+                            <button className="remove" type="button" onClick={() => remove(index)}>
                               Remove
                             </button>
+                            {errors.equipment?.[index] && touched.equipment?.[index] && (
+                              <div className="error-message">{errors.equipment[index]}</div>
+                            )}
                           </div>
                         ))}
                         <button type="button" onClick={() => push("")}>
@@ -124,7 +127,6 @@ export default function ProjectsPage() {
                   </FieldArray>
                 </div>
 
-                {/* Idea Section */}
                 <div>
                   <label htmlFor="idea">Project Idea</label>
                   <Field
@@ -137,7 +139,6 @@ export default function ProjectsPage() {
                   />
                 </div>
 
-                {/* Dates and Deadlines Section */}
                 <div>
                   <label>Dates & Deadlines</label>
                   <FieldArray name="deadlines">
@@ -149,16 +150,28 @@ export default function ProjectsPage() {
                               selected={deadline.date}
                               onChange={(date) => setFieldValue(`deadlines[${index}].date`, date)}
                               placeholderText="Pick a date"
-                              className="form-field"
+                              className={`form-field ${
+                                errors.deadlines?.[index]?.date && touched.deadlines?.[index]?.date ? "error-field" : ""
+                              }`}
                             />
                             <Field
                               name={`deadlines[${index}].description`}
                               placeholder="What's this deadline about?"
-                              className="form-field"
+                              className={`form-field ${
+                                errors.deadlines?.[index]?.description && touched.deadlines?.[index]?.description
+                                  ? "error-field"
+                                  : ""
+                              }`}
                             />
-                            <button type="button" onClick={() => remove(index)}>
+                            <button className="remove" type="button" onClick={() => remove(index)}>
                               Remove
                             </button>
+                            {errors.deadlines?.[index]?.date && touched.deadlines?.[index]?.date && (
+                              <div className="error-message">{errors.deadlines[index].date}</div>
+                            )}
+                            {errors.deadlines?.[index]?.description && touched.deadlines?.[index]?.description && (
+                              <div className="error-message">{errors.deadlines[index].description}</div>
+                            )}
                           </div>
                         ))}
                         <button type="button" onClick={() => push({ date: null, description: "" })}>
@@ -169,7 +182,6 @@ export default function ProjectsPage() {
                   </FieldArray>
                 </div>
 
-                {/* Images Section */}
                 <div>
                   <label>Images</label>
                   <FieldArray name="images">
@@ -187,7 +199,7 @@ export default function ProjectsPage() {
                               placeholder="Image URL"
                               className="form-field"
                             />
-                            <button type="button" onClick={() => remove(index)}>
+                            <button className="remove" type="button" onClick={() => remove(index)}>
                               Remove
                             </button>
                           </div>

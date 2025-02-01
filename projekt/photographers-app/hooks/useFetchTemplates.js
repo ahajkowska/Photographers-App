@@ -31,7 +31,7 @@ function useFetchTemplates(loggedInUserId) {
     fetchTemplates();
   }, [loggedInUserId]);
 
-  return templates;
+  return [templates, setTemplates];
 }
 
 export default useFetchTemplates;

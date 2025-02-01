@@ -6,41 +6,44 @@ import Link from 'next/link';
 export default function RegisterPage() {
     const [formData, setFormData] = useState({ username: "", email: "", password: "" });
     const [message, setMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const [redirectToLogin, setRedirectToLogin] = useState(false);
-    const [passwordError, setPasswordError] = useState(false);
-    const [usernameError, setUsernameError] = useState(false);
+    const [inputErrors, setInputErrors] = useState({ username: false, password: false });
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
+        setInputErrors({ ...inputErrors, [name]: false }); // Reset errors on input
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setMessage("");
+        setIsLoading(true);
 
-        // Validate password
+        // Validate password length
         if (formData.password.length < 6) {
-            setPasswordError(true);
+            setInputErrors({ ...inputErrors, password: true });
             setMessage("Password must be at least 6 characters long.");
+            setIsLoading(false);
             return;
-        } else {
-            setPasswordError(false);
         }
 
         // Check if username already exists
         try {
-            const checkResponse = await fetch(`/api/users/check-username?username=${formData.username}`);
-            const checkData = await checkResponse.json();
+            const checkResponse = await fetch("/api/users");
+            const users = await checkResponse.json();
+            const usernameExists = users.some(user => user.username === formData.username);
 
-            if (checkData.exists) {
-                setUsernameError(true);
+            if (usernameExists) {
+                setInputErrors({ ...inputErrors, username: true });
                 setMessage("Username is already taken.");
+                setIsLoading(false);
                 return;
-            } else {
-                setUsernameError(false);
             }
         } catch (error) {
             setMessage("Error checking username availability.");
+            setIsLoading(false);
             return;
         }
 
@@ -57,11 +60,13 @@ export default function RegisterPage() {
                 throw new Error(error);
             }
 
-            setMessage("Registration successful!");
+            setMessage("Registration successful! Redirecting...");
             setFormData({ username: "", email: "", password: "" });
-            setRedirectToLogin(true);
+            setTimeout(() => setRedirectToLogin(true), 500);
         } catch (error) {
             setMessage(error.message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -77,7 +82,7 @@ export default function RegisterPage() {
                     value={formData.username}
                     onChange={handleInputChange}
                     required
-                    className={usernameError ? "input-error" : ""}
+                    className={inputErrors.username ? "input-error" : ""}
                 />
                 <input
                     type="email"
@@ -94,9 +99,11 @@ export default function RegisterPage() {
                     value={formData.password}
                     onChange={handleInputChange}
                     required
-                    className={passwordError ? "input-error" : ""}
+                    className={inputErrors.password ? "input-error" : ""}
                 />
-                <button type="submit">Register</button>
+                <button type="submit" disabled={isLoading}>
+                    {isLoading ? "Registering..." : "Register"}
+                </button>
             </form>
             {message && <p>{message}</p>}
             {redirectToLogin && <Link href="/login">Redirecting to login...</Link>}

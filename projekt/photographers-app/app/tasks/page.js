@@ -23,7 +23,7 @@ export default function TaskPage() {
   const [loggedInUserId, setLoggedInUserId] = useState(null);
   const titleInputRef = useRef(null);
 
-  const templates = useFetchTemplates(loggedInUserId);
+  const [templates, setTemplates] = useFetchTemplates(loggedInUserId);
   const [taskLists, setTaskLists] = useFetchTasks(loggedInUserId);
 
   useLayoutEffect(() => {
@@ -83,7 +83,7 @@ export default function TaskPage() {
 
       if (response.ok) {
         const savedTemplate = await response.json();
-        setTemplates([...templates, savedTemplate]);
+        setTemplates((prevTemplates) => [...prevTemplates, savedTemplate]);
         setNewTemplateName("");
         setNewTemplateTasks([]);
         setNewTemplateEquipment([]);
@@ -226,15 +226,14 @@ export default function TaskPage() {
             <h2>Select a Template</h2>
             <select onChange={(e) => handleTemplateSelect(e.target.value)} value={selectedTemplate}>
               <option value="">No Template</option>
-              {templates.map((template) => (
-                <option key={template.name} value={template.name}>
+              {templates.map((template, idx) => (
+                <option key={`${template.name}-${idx}`} value={template.name}>
                   {template.isDefault ? `Default: ${template.name}` : `Custom: ${template.name}`}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Task Editor */}
           <TaskEditor
             title={title}
             setTitle={setTitle}
@@ -253,11 +252,11 @@ export default function TaskPage() {
             titleInputRef={titleInputRef}
           />
 
-          {/* Task List */}
           <TaskList
             taskLists={taskLists}
             editTaskList={editTaskList}
             deleteTaskList={deleteTaskList}
+            handleTaskCompletion={handleTaskCompletion}
           />
         </>
       ) : (

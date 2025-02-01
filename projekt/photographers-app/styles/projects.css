@@ -11,6 +11,10 @@
     color: var(--button-bg);
 }
 
+.remove {
+  height: 45px;
+}
+
 .project-form {
     border-radius: 8px;
     padding: 20px;

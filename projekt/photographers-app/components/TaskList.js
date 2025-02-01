@@ -1,6 +1,10 @@
 import React from 'react';
 
 export default function TaskList({ taskLists, editTaskList, deleteTaskList }) {
+  const handleReadOnlyClick = () => {
+    alert("You must click edit to do this activity");
+  };
+  
   return (
     <div className="task-viewer">
       <h2>Saved Task Lists</h2>
@@ -10,7 +14,7 @@ export default function TaskList({ taskLists, editTaskList, deleteTaskList }) {
           <ul>
             {list.tasks.map((task, idx) => (
               <li key={idx} className={task.isCompleted ? "completed" : ""}>
-                <input type="checkbox" checked={task.isCompleted} readOnly />
+                <input type="checkbox" checked={task.isCompleted} readOnly onClick={handleReadOnlyClick} />
                 <span>{task.text}</span>
               </li>
             ))}
@@ -21,7 +25,7 @@ export default function TaskList({ taskLists, editTaskList, deleteTaskList }) {
             {Array.isArray(list.equipment) && list.equipment.length > 0 ? (
               list.equipment.map((item, idx) => (
                 <li key={idx} className={item.isCompleted ? "completed" : ""}>
-                  <input type="checkbox" checked={item.isCompleted} readOnly />
+                  <input type="checkbox" checked={item.isCompleted} readOnly onClick={handleReadOnlyClick} />
                   <span>{item.name}</span>
                 </li>
               ))
