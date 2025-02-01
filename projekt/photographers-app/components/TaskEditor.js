@@ -17,15 +17,6 @@ export default function TaskEditor({
   editingListId,
   titleInputRef
 }) {
-  function onChange(event) {
-    const { name, value } = event.target;
-
-    // Assuming you're updating an object in state
-    setState((prevState) => ({
-        ...prevState,
-        [name]: value,
-    }));
-  }
 
   return (
     <div>

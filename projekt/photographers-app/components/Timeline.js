@@ -13,7 +13,7 @@ export default function Timeline({ deadlines }) {
       {sortedDeadlines.map((deadline, index) => (
         <div key={index} className="timeline-item">
           <div className="timeline-date">
-            {new Date(deadline.date).toLocaleDateString()}
+            {new Date(deadline.date).toLocaleDateString("pl-PL")}
           </div>
           <div className="timeline-content">
             <p>{deadline.description}</p>

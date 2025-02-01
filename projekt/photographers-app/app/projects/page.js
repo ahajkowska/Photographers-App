@@ -219,7 +219,6 @@ export default function ProjectsPage() {
             )}
           </Formik>
 
-          {/* Project List */}
           <div className="project-list">
             {projects.map((project) => (
               <div key={project._id} className="project-card">

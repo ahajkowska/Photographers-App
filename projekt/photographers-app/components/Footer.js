@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <footer className="footer">
       <div className="footer-content">
-        <p>© 2025 Photographer's App. All rights reserved.</p>
+        <p>&#169; 2025 Photographer's App.</p>
         <div className="social-icons">
           <a href="https://facebook.com">
             <img src="/assets/icons/facebook.png" alt="Facebook" />
