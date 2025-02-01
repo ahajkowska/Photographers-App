@@ -2,71 +2,50 @@
 
 import { useState } from "react";
 import Link from 'next/link';
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
 export default function RegisterPage() {
-    const [formData, setFormData] = useState({ username: "", email: "", password: "" });
     const [message, setMessage] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
     const [redirectToLogin, setRedirectToLogin] = useState(false);
-    const [inputErrors, setInputErrors] = useState({ username: false, password: false });
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-        setInputErrors({ ...inputErrors, [name]: false }); // Reset errors on input
-    };
+    const validationSchema = Yup.object({
+        username: Yup.string().min(3, "Username must be at least 3 characters").required("Username is required"),
+        email: Yup.string().email("Invalid email").required("Email is required"),
+        password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+    });
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async (values, { setSubmitting, setErrors, resetForm }) => {
         setMessage("");
-        setIsLoading(true);
 
-        // Validate password length
-        if (formData.password.length < 6) {
-            setInputErrors({ ...inputErrors, password: true });
-            setMessage("Password must be at least 6 characters long.");
-            setIsLoading(false);
-            return;
-        }
-
-        // Check if username already exists
         try {
+            // czy istnieje
             const checkResponse = await fetch("/api/users");
             const users = await checkResponse.json();
-            const usernameExists = users.some(user => user.username === formData.username);
+            const usernameExists = users.some(user => user.username === values.username);
 
             if (usernameExists) {
-                setInputErrors({ ...inputErrors, username: true });
-                setMessage("Username is already taken.");
-                setIsLoading(false);
+                setErrors({ username: "Username is already taken." });
                 return;
             }
-        } catch (error) {
-            setMessage("Error checking username availability.");
-            setIsLoading(false);
-            return;
-        }
 
-        // Proceed with registration
-        try {
+            // rejestracja
             const response = await fetch("/api/users", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(values),
             });
 
             if (!response.ok) {
-                const error = await response.text();
-                throw new Error(error);
+                throw new Error(await response.text());
             }
 
-            setMessage("Registration successful! Redirecting...");
-            setFormData({ username: "", email: "", password: "" });
+            resetForm();
             setTimeout(() => setRedirectToLogin(true), 500);
         } catch (error) {
             setMessage(error.message);
         } finally {
-            setIsLoading(false);
+            setSubmitting(false);
         }
     };
 
@@ -74,37 +53,30 @@ export default function RegisterPage() {
         <div className="register-page">
             <h1>Register</h1>
             <button className="go-back" onClick={() => window.history.back()}>Go back</button>
-            <form onSubmit={handleSubmit} className="register-form">
-                <input
-                    type="text"
-                    name="username"
-                    placeholder="Username"
-                    value={formData.username}
-                    onChange={handleInputChange}
-                    required
-                    className={inputErrors.username ? "input-error" : ""}
-                />
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                />
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    required
-                    className={inputErrors.password ? "input-error" : ""}
-                />
-                <button type="submit" disabled={isLoading}>
-                    {isLoading ? "Registering..." : "Register"}
-                </button>
-            </form>
+
+            <Formik
+                initialValues={{ username: "", email: "", password: "" }}
+                validationSchema={validationSchema}
+                onSubmit={handleSubmit}
+            >
+                {({ isSubmitting }) => (
+                    <Form className="register-form">
+                        <Field type="text" name="username" placeholder="Username" />
+                        <ErrorMessage name="username" component="div" className="error-message" />
+
+                        <Field type="email" name="email" placeholder="Email" />
+                        <ErrorMessage name="email" component="div" className="error-message" />
+
+                        <Field type="password" name="password" placeholder="Password" />
+                        <ErrorMessage name="password" component="div" className="error-message" />
+
+                        <button type="submit" disabled={isSubmitting}>
+                            {isSubmitting ? "Registering..." : "Register"}
+                        </button>
+                    </Form>
+                )}
+            </Formik>
+
             {message && <p>{message}</p>}
             {redirectToLogin && <Link href="/login">Redirecting to login...</Link>}
             <p>Already have an account? <Link href="/login">Login here</Link></p>
