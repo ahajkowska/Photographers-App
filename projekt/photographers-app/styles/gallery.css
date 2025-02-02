@@ -268,3 +268,13 @@ input {
   font-size: 2rem;
   color: var(--button-bg);
 }
+
+.like-button {
+  cursor: pointer;
+  font-size: 24px;
+  transition: transform 0.2s ease;
+}
+
+.like-button:hover {
+  transform: scale(1.2);
+}

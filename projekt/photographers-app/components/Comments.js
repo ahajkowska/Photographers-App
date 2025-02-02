@@ -32,6 +32,7 @@ export default function Comments({ photo, loggedInUserId, handleAddComment, hand
       <div className="add-comment">
         <input
           type="text"
+          name="comment"
           placeholder="Add a comment"
           value={photoComments[photo._id] || ""}
           onChange={(e) =>

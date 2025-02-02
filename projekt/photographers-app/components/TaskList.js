@@ -14,7 +14,7 @@ export default function TaskList({ taskLists, editTaskList, deleteTaskList }) {
           <ul>
             {list.tasks.map((task, idx) => (
               <li key={idx} className={task.isCompleted ? "completed" : ""}>
-                <input type="checkbox" checked={task.isCompleted} readOnly onClick={handleReadOnlyClick} />
+                <input type="checkbox" checked={task.isCompleted} readOnly onClick={handleReadOnlyClick} name="completed"/>
                 <span>{task.text}</span>
               </li>
             ))}
@@ -25,7 +25,7 @@ export default function TaskList({ taskLists, editTaskList, deleteTaskList }) {
             {Array.isArray(list.equipment) && list.equipment.length > 0 ? (
               list.equipment.map((item, idx) => (
                 <li key={idx} className={item.isCompleted ? "completed" : ""}>
-                  <input type="checkbox" checked={item.isCompleted} readOnly onClick={handleReadOnlyClick} />
+                  <input type="checkbox" checked={item.isCompleted} readOnly onClick={handleReadOnlyClick} name="completed"/>
                   <span>{item.name}</span>
                 </li>
               ))

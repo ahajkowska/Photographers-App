@@ -147,6 +147,7 @@ export default function ProjectsPage() {
                         {values.deadlines.map((deadline, index) => (
                           <div key={index} style={{ display: "flex", gap: "10px" }}>
                             <DatePicker
+                              name={`deadlines[${index}].date`}
                               selected={deadline.date}
                               onChange={(date) => setFieldValue(`deadlines[${index}].date`, date)}
                               placeholderText="Pick a date"

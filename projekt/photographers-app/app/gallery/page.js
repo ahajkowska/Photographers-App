@@ -1,5 +1,6 @@
 "use client";
 
+import { FaHeart, FaRegHeart, FaTrash, FaEdit } from "react-icons/fa";
 import { useState, useEffect, useMemo } from "react";
 import useGallery from "../../hooks/useGallery";
 import Statistics from "../../components/Statistics";
@@ -163,6 +164,7 @@ export default function GalleryPage() {
         placeholder="Search (by title or tag)"
         value={searchTag}
         onChange={(e) => setSearchTag(e.target.value)}
+        name="search"
         className="search"
       />
       
@@ -212,9 +214,16 @@ export default function GalleryPage() {
             <div className="photo-likes">
               <p>{photo.likes?.length || 0} Likes</p>
               {photo.likes?.includes(loggedInUserId) ? (
-                <button onClick={() => handleUnlikePhoto(photo._id, loggedInUserId, dispatch, state)}>Unlike</button>
+                <FaHeart 
+                  className="like-button" 
+                  color="red" 
+                  onClick={() => handleUnlikePhoto(photo._id, loggedInUserId, dispatch, state)}
+                />
               ) : (
-                <button onClick={() => handleLikePhoto(photo._id, loggedInUserId, dispatch, state)}>Like</button>
+                <FaRegHeart 
+                  className="like-button" 
+                  onClick={() => handleLikePhoto(photo._id, loggedInUserId, dispatch, state)}
+                />
               )}
             </div>
 
@@ -232,8 +241,8 @@ export default function GalleryPage() {
 
             {photo.userId === loggedInUserId && (
               <div className="gallery-actions">
-                <button onClick={() => handleEditPhoto(photo, setCurrentPhoto, setIsModalOpen)}>Edit</button>
-                <button onClick={() => handleDeletePhoto(photo._id, dispatch, state, calculateStatistics)}>Delete</button>
+                <button onClick={() => handleEditPhoto(photo, setCurrentPhoto, setIsModalOpen)}><FaEdit /> Edit</button>
+                <button onClick={() => handleDeletePhoto(photo._id, dispatch, state, calculateStatistics)}><FaTrash /> Delete</button>
               </div>
             )}
           </div>
@@ -247,6 +256,7 @@ export default function GalleryPage() {
             <h2>Edit Photo</h2>
             <input
               type="text"
+              name="title"
               value={currentPhoto.title}
               onChange={(e) =>
                 setCurrentPhoto({ ...currentPhoto, title: e.target.value })
@@ -254,6 +264,7 @@ export default function GalleryPage() {
             />
             <input
               type="text"
+              name="tags"
               value={currentPhoto.tags.join(", ")}
               onChange={(e) =>
                 setCurrentPhoto({ ...currentPhoto, tags: e.target.value.split(",").map(tag => tag.trim()) })
