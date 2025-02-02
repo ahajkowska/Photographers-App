@@ -53,7 +53,7 @@ export default function TaskEditor({
 
       <h3>Equipment:</h3>
       {equipment.map((item, index) => (
-        <div key={index} className="equipment-item">
+        <div key={index} className={`equipment-item ${item.isCompleted ? "completed" : ""}`}>
           <input
             type="checkbox"
             checked={item.isCompleted}

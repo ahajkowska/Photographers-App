@@ -8,11 +8,13 @@
 }
 
 .task-page .task-item.completed input[type="text"],
+.task-page .equipment-item.completed input[type="text"],
 .task-page ul li.completed {
   text-decoration: line-through;
   color: gray;
   background-color: #e0ffe0;
 }
+
 
 .task-page .task-item {
   display: flex;
