@@ -13,6 +13,7 @@ import ThemeToggle from "../components/ThemeToggle";
 export const metadata = {
   title: "Photographers App",
   description: "Your app for managing photo projects and galleries.",
+  icons: "/favicon.ico",
 };
 
 export default function RootLayout({ children }) {

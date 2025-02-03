@@ -2,11 +2,11 @@ import dbConnect from "../../../../lib/mongodb";
 import Task from "../../../../models/Task";
 
 // Update task list
-export async function PUT(req, { params }) {
+export async function PUT(req, context) {
   await dbConnect();
 
   try {
-    const { id } = params; // task list ID
+    const { id } = await context.params; // task list ID
     const { title, tasks, equipment } = await req.json();
 
     if (!id || (!title && !tasks && !equipment)) {
@@ -37,11 +37,11 @@ export async function PUT(req, { params }) {
 }
 
 // Delete task list
-export async function DELETE(req, { params }) {
+export async function DELETE(req, context) {
   await dbConnect();
 
   try {
-    const { id } = params;
+    const { id } = await context.params;
 
     if (!id) {
       return new Response(JSON.stringify({ error: "Task list ID is required" }), { status: 400 });

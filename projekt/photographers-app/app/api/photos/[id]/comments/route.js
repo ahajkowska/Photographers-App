@@ -1,11 +1,11 @@
 import dbConnect from "../../../../../lib/mongodb";
 import Photo from "../../../../../models/Photo";
 
-export async function POST(req, { params }) {
+export async function POST(req, context) {
   await dbConnect();
 
   try {
-    const { id } = params;
+    const { id } = await context.params;
     const { userId, username, text } = await req.json();
 
     if (!id || !userId || !text || !username) {
@@ -32,7 +32,7 @@ export async function POST(req, { params }) {
   }
 }
 
-export async function DELETE(req, { params }) {
+export async function DELETE(req) {
   await dbConnect();
 
   try {
