@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { Formik, Form, Field, FieldArray } from "formik";
 import * as Yup from "yup";
 import DatePicker from "react-datepicker";
@@ -14,6 +14,7 @@ export default function ProjectsPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentProject, setCurrentProject] = useState(null);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
+  const titleInputRef = useRef(null);
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
@@ -22,6 +23,12 @@ export default function ProjectsPage() {
       fetchProjects(userId);
     }
   }, []);
+
+  useEffect(() => {
+    if (titleInputRef.current) {
+      titleInputRef.current.focus();
+    }
+  }, [isEditing]);
 
   const fetchProjects = async (userId) => {
     try {
@@ -91,6 +98,7 @@ export default function ProjectsPage() {
                     name="title"
                     placeholder="Enter project title"
                     className={`form-field ${errors.title && touched.title ? "error-field" : ""}`}
+                    innerRef={titleInputRef}
                   />
                   {errors.title && touched.title && (
                     <div className="error-message">{errors.title}</div>
