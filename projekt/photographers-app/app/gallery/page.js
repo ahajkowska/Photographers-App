@@ -241,8 +241,8 @@ export default function GalleryPage() {
 
             {photo.userId === loggedInUserId && (
               <div className="gallery-actions">
-                <button onClick={() => handleEditPhoto(photo, setCurrentPhoto, setIsModalOpen)}><FaEdit /> Edit</button>
-                <button onClick={() => handleDeletePhoto(photo._id, dispatch, state, calculateStatistics)}><FaTrash /> Delete</button>
+                <button onClick={() => handleEditPhoto(photo, setCurrentPhoto, setIsModalOpen)}><FaEdit/> Edit</button>
+                <button onClick={() => handleDeletePhoto(photo._id, dispatch, state, calculateStatistics)}><FaTrash/> Delete</button>
               </div>
             )}
           </div>
@@ -271,7 +271,7 @@ export default function GalleryPage() {
               }
             />
             <div className="modal-actions">
-              <button onClick={() => handleUpdatePhoto(currentPhoto, dispatch, setIsModalOpen, setCurrentPhoto)}>Save</button>
+              <button onClick={() => handleUpdatePhoto(currentPhoto, dispatch, setIsModalOpen, setCurrentPhoto, state)}>Save</button>
               <button onClick={() => setIsModalOpen(false)}>Cancel</button>
             </div>
           </div>

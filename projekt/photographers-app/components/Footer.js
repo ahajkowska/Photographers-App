@@ -1,4 +1,5 @@
 import React from "react";
+import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
 
 export default function Footer() {
   return (
@@ -7,13 +8,13 @@ export default function Footer() {
         <p>&#169; 2025 Photographer's App.</p>
         <div className="social-icons">
           <a href="https://facebook.com">
-            <img src="/assets/icons/facebook.png" alt="Facebook" />
+            <FaFacebook color="white" />
           </a>
           <a href="https://instagram.com">
-            <img src="/assets/icons/instagram.png" alt="Instagram" />
+            <FaInstagram color="white" />
           </a>
           <a href="https://twitter.com">
-            <img src="/assets/icons/twitter.png" alt="Twitter" />
+            <FaTwitter color="white" />
           </a>
         </div>
       </div>

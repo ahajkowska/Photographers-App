@@ -21,7 +21,7 @@ export const handleAddPhoto = async (e, newPhoto, loggedInUserId, loggedInUserna
       const savedPhoto = await response.json();
       const updatedPhoto = { ...savedPhoto, username: loggedInUsername };
       dispatch({ type: "ADD_PHOTO", payload: updatedPhoto });
-      setNewPhoto({ title: "", image: "", tags: [] }); // Reset form
+      setNewPhoto({ title: "", image: "", tags: [] }); // reset form
       calculateStatistics([...state.photos, updatedPhoto]);
     } else {
       console.error("Failed to add photo");
@@ -37,7 +37,7 @@ export const handleDeletePhoto = async (photoId, dispatch, state, calculateStati
     if (response.ok) {
       console.log("Photo deleted successfully");
       dispatch({ type: "DELETE_PHOTO", payload: photoId });
-      calculateStatistics(state.photos.filter((photo) => photo._id !== photoId)); // Update statistics after deletion
+      calculateStatistics(state.photos.filter((photo) => photo._id !== photoId)); // update statistics after deletion
     } else {
       const errorText = await response.text();
       console.error("Failed to delete photo:", errorText);
@@ -47,19 +47,40 @@ export const handleDeletePhoto = async (photoId, dispatch, state, calculateStati
 export const handleEditPhoto = (photo, setCurrentPhoto, setIsModalOpen) => {
     setCurrentPhoto(photo);
     setIsModalOpen(true);
-  };
+};
 
-export const handleUpdatePhoto = async (currentPhoto, dispatch, setIsModalOpen, setCurrentPhoto) => {
+export const handleUpdatePhoto = async (currentPhoto, dispatch, setIsModalOpen, setCurrentPhoto, state) => {
+  try {
+    const existingPhoto = state.photos.find(photo => photo._id === currentPhoto._id);
+
     const response = await fetch(`/api/photos/${currentPhoto._id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: currentPhoto.title, tags: currentPhoto.tags }),
+      body: JSON.stringify({
+        title: currentPhoto.title,
+        tags: currentPhoto.tags,
+        username: existingPhoto?.username || currentPhoto.username,
+      }),
     });
+    if (!response.ok) {
+      console.error("Failed to update photo");
+      return;
+    }
+
     const updatedPhoto = await response.json();
-    dispatch({ type: "UPDATE_PHOTO", payload: updatedPhoto });
+
+    const photoWithUsername = {
+      ...updatedPhoto,
+      username: existingPhoto?.username || currentPhoto.username, 
+    };
+
+    dispatch({ type: "UPDATE_PHOTO", payload: photoWithUsername });
     setIsModalOpen(false);
     setCurrentPhoto(null);
-  };
+  } catch (error) {
+    console.error("Error updating photo:", error);
+  }
+};
 
 export const handleLikePhoto = async (photoId, loggedInUserId, dispatch, state) => {
   try {
