@@ -1,6 +1,6 @@
 # 📸 **Photographers App** 🎨  
 
-A *web application designed for photographers to **showcase their work**, **manage tasks**, **organize projects** efficiently and help them **develop new ideas**. Built with **Next.js**, **React**, and **MongoDB**, this project provides an intuitive user experience for managing photo galleries, task lists, and projects.
+A web application designed for photographers to **showcase their work**, **manage tasks**, **organize projects** efficiently and help them **develop new ideas**. Built with **Next.js**, **React**, and **MongoDB**, this project provides an intuitive user experience for managing photo galleries, task lists, and projects.
 
 ---
 
@@ -28,8 +28,8 @@ A *web application designed for photographers to **showcase their work**, **mana
 - Save project ideas and important details.
 - Edit and delete projects with ease.
 
-### **Idea Generator**
-- Generate each item (Location, subject, color, theme, challenge)
+### 🎲 **Idea Generator**
+- Generate each item (location, subject, color, theme, challenge)
 - Generate all at once
 - See a changing sentence at the end which sums up your outcome
 
@@ -40,10 +40,16 @@ A *web application designed for photographers to **showcase their work**, **mana
 ---
 
 ## 🛠️ **Tech Stack**
-- **Frontend:** Next.js, React, CSS
-- Formik and Yup for validation
-- **State Management:** useContext, useReducer, useMemo, useRef, useCallback
-- **Backend:** Node.js, MongoDB
+- **Frontend:**
+- Next.js,
+- React (Formik & Yup for validation, React Icons, React DatePicker),
+- CSS
+
+- **Backend:**
+- Node.js,
+- MongoDB
+- API Routes (Next.js),
+- bcrypt
 
 ---
 
